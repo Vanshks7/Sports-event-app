@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details & Slot Matrix — Community Multisports Portal</title>
+  <meta name="description" content="Event overview, attendance confirmation, court allocations, and 30-minute slot matrix for the Community Multisports Series.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .event-hero-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-hero-panel::after {
+      display: none;
+    }
+
+    .event-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .event-meta-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .event-meta-cell .label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .event-meta-cell .value {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 860px) {
+      .event-meta-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Attendance Confirmation Banner */
+    .attendance-card {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: var(--radius-sm);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .attendance-card.confirmed {
+      background: #F0FDF4;
+      border-color: #86EFAC;
+    }
+
+    /* Slot Booking Sandbox Area */
+    .slot-sandbox-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+    }
+
+    .sport-filter-tabs {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .sport-filter-btn {
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xs);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+
+    .sport-filter-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-main);
+    }
+
+    .sport-filter-btn.active {
+      background: #121214;
+      border-color: #121214;
+      color: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .booked-player-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      margin-top: 4px;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    <div class="container section">
+
+      <!-- Back Link -->
+      <div style="margin-bottom: var(--space-4);">
+        <a href="events.html" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem;">
+          ← Back to Events Calendar
+        </a>
+      </div>
+
+      <!-- EVENT HERO PANEL -->
+      <div class="event-hero-panel" id="event-header-panel">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span class="event-round-pill" id="event-round-badge">Round 01</span>
+              <span class="badge badge-cyan" id="event-status-badge"><span class="badge-dot"></span> Loading Status...</span>
+            </div>
+            <h1 style="font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 8px;" id="event-title">
+              Loading Event...
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1.05rem;" id="event-venue">
+              📍 Loading Venue...
+            </p>
+          </div>
+
+          <div style="text-align: right;">
+            <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase;">Event Date</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);" id="event-date">
+              --
+            </div>
+            <div style="color: var(--accent-cyan); font-weight: 600;" id="event-time">
+              --
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta Grid -->
+        <div class="event-meta-grid">
+          <div class="event-meta-cell">
+            <span class="label">Booking Window</span>
+            <span class="value" style="color: var(--accent-cyan);" id="meta-open-date">--</span>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Opens 7 Days Prior</span>
+          </div>
+
+          <div class="event-meta-cell">
+            <span class="label">Attendance Lock</span>
+            <span class="value" style="color: var(--accent-amber);" id="meta-close-date">--</span>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">T-48 Hours Lock</span>
+          </div>
+
+          <div class="event-meta-cell">
+            <span class="label">Quota Allowance</span>
+            <span class="value" id="meta-quota">Max 2 Slots</span>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Per Player per Evening</span>
+          </div>
+
+          <div class="event-meta-cell">
+            <span class="label">Capacity & Attendance</span>
+            <span class="value" id="meta-attendance">--</span>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Confirmed Community Players</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMPLE 3-STEP PLAYER BOOKING GUIDE -->
+      <div style="background: rgba(14, 165, 233, 0.05); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: var(--space-6); display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <div style="background: var(--accent-cyan); color: #000; font-weight: 800; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;">1</div>
+          <div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">1. Confirm Attendance</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Click "I will Attend" below to let organizers know you're coming and unlock slot booking.</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <div style="background: var(--accent-amber); color: #000; font-weight: 800; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;">2</div>
+          <div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">2. Pick Sport & Time</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Select Pickleball, Paddle Ball, or Box Cricket across available 30-minute intervals.</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <div style="background: var(--status-emerald); color: #000; font-weight: 800; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;">3</div>
+          <div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">3. Reserve up to 2 Slots</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Book your preferred slot. If full, join the waitlist for automatic FIFO promotion upon cancellation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEPARATE EVENT ATTENDANCE CONFIRMATION PANEL -->
+      <div id="attendance-panel-container">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- MY ACTIVE BOOKINGS SUMMARY FOR THIS EVENT -->
+      <div id="my-bookings-container" style="margin-bottom: var(--space-6); display: none;">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- LIVE 30-MINUTE SLOT MATRIX INTERFACE -->
+      <div class="slot-sandbox-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.6rem; margin-bottom: 4px;">Live 30-Minute Court-Slot Allocations</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+              Select a sport and court to view live capacity units or reserve your 30-minute spot.
+            </p>
+          </div>
+          <div>
+            <span class="badge badge-amber"><span class="badge-dot"></span> Quota Limit: 2 Slots per Player</span>
+          </div>
+        </div>
+
+        <!-- Sport Switcher -->
+        <div class="sport-filter-tabs">
+          <button class="sport-filter-btn active" data-sport="pickleball">
+            🏓 Pickleball (10 Courts • 4/slot)
+          </button>
+          <button class="sport-filter-btn" data-sport="paddle_ball">
+            🎾 Paddle Ball (4 Courts • 4/slot)
+          </button>
+          <button class="sport-filter-btn" data-sport="box_cricket">
+            🏏 Box Cricket (2 Arenas • 14/slot)
+          </button>
+        </div>
+
+        <!-- Court Selector Tabs -->
+        <div class="court-tabs" id="court-selector-tabs">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- 30-Minute Slot Matrix Grid -->
+        <div class="slots-grid" id="slots-matrix-display">
+          <div style="text-align: center; padding: 32px; color: var(--text-muted); grid-column: 1 / -1;">
+            ⏳ Loading court slots from database...
+          </div>
+        </div>
+
+      </div>
+
+      <!-- EVENT OPERATIONAL POLICY CARDS -->
+      <div class="grid-3">
+        <div class="glass-card">
+          <h4 style="color: var(--accent-cyan); margin-bottom: 8px;">Attendance Policy</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Attendance confirmation is collected separately from slot booking to avoid advance no-shows. Confirmed players gain eligibility to reserve court spots during the 7-day window.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <h4 style="color: var(--accent-amber); margin-bottom: 8px;">Cancellation & Waitlists</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Cancel slots before the T-48h deadline without penalty. Vacated spots are immediately allocated to waitlisted players in sequential First-In-First-Out (FIFO) queue order.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <h4 style="color: var(--status-emerald); margin-bottom: 8px;">Check-In & Match Passes</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Doubles and match squads are coordinated live based on player rating and attendance confirmations. Bring your digital match pass (Unique Player ID) to the desk.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      UI.renderNavbar('events');
+      UI.renderFooter();
+
+      // Get Event ID from URL query params (default to evt_001 or 1)
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawId = urlParams.get('id') || 'evt_001';
+      const eventId = rawId.startsWith('evt_') ? rawId : (parseInt(rawId, 10) === 1 ? 'evt_001' : rawId);
+
+      const currentUser = DB.getCurrentUser();
+      let eventData = null;
+      let allSlots = [];
+      let selectedSport = 'pickleball';
+      let selectedCourtNum = 1;
+
+      const attendanceContainer = document.getElementById('attendance-panel-container');
+      const myBookingsContainer = document.getElementById('my-bookings-container');
+      const courtTabsContainer = document.getElementById('court-selector-tabs');
+      const slotsContainer = document.getElementById('slots-matrix-display');
+
+      // 1. Load Event Data
+      async function loadEventData() {
+        try {
+          eventData = await DB.getEventById(eventId);
+          if (!eventData) throw new Error('Event not found.');
+
+          // Populate Header
+          document.getElementById('event-round-badge').textContent = eventData.round || `Round ${eventData.event_number}`;
+          document.getElementById('event-status-badge').innerHTML = `<span class="badge-dot"></span> ${eventData.statusLabel || eventData.status}`;
+          document.getElementById('event-status-badge').className = `badge ${eventData.statusBadgeClass || 'badge-cyan'}`;
+          document.getElementById('event-title').textContent = eventData.title;
+          document.getElementById('event-venue').textContent = `📍 ${eventData.venue}`;
+          document.getElementById('event-date').textContent = eventData.event_date;
+          document.getElementById('event-time').textContent = eventData.time || `${eventData.start_time} – ${eventData.end_time}`;
+          document.getElementById('meta-open-date').textContent = eventData.booking_open_at || eventData.bookingWindow?.displayOpens;
+          document.getElementById('meta-close-date').textContent = eventData.booking_close_at || eventData.bookingWindow?.displayCloses;
+          document.getElementById('meta-quota').textContent = `Max ${eventData.max_slots_per_player || 2} Slots`;
+          document.getElementById('meta-attendance').textContent = `${eventData.confirmed_attendees || 0} Attending`;
+
+          renderAttendancePanel();
+          renderMyBookings();
+          await loadSlots();
+        } catch (err) {
+          slotsContainer.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+        }
+      }
+
+      // 2. Render Attendance Confirmation Banner
+      function renderAttendancePanel() {
+        if (!currentUser) {
+          attendanceContainer.innerHTML = `
+            <div class="attendance-card">
+              <div>
+                <strong style="color: var(--text-main); font-size: 1.05rem;">🔐 Player Login Required</strong>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+                  Log in with your permanent Player ID (MP/FP) to confirm attendance and unlock live slot reservations.
+                </p>
+              </div>
+              <a href="login.html" class="btn btn-primary btn-sm">Log In Now →</a>
+            </div>
+          `;
+          return;
+        }
+
+        const isConfirmed = eventData.userAttendance === 'CONFIRMED';
+        const isDeclined = eventData.userAttendance === 'DECLINED';
+
+        attendanceContainer.innerHTML = `
+          <div class="attendance-card ${isConfirmed ? 'confirmed' : ''}">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.3rem;">${isConfirmed ? '✅' : (isDeclined ? '❌' : '📋')}</span>
+                <strong style="font-size: 1.1rem; color: var(--text-main);">
+                  Event Attendance Status: ${isConfirmed ? 'CONFIRMED' : (isDeclined ? 'DECLINED' : 'NOT CONFIRMED')}
+                </strong>
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 6px;">
+                ${isConfirmed 
+                  ? 'Your event attendance is confirmed! You are authorized to reserve up to 2 court slots below.'
+                  : (isDeclined 
+                    ? 'You marked that you will not be attending. Click "Confirm Attendance" below if your plans have changed.'
+                    : 'The approved framework requires attendance confirmation prior to booking court slots. Confirm now to participate.')}
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              ${!isConfirmed ? `
+                <button type="button" class="btn btn-primary" id="btn-confirm-attendance">
+                  ✅ Confirm My Attendance
+                </button>
+              ` : `
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-decline-attendance">
+                  Change to Decline
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+
+        const btnConfirm = document.getElementById('btn-confirm-attendance');
+        if (btnConfirm) {
+          btnConfirm.addEventListener('click', async () => {
+            try {
+              btnConfirm.disabled = true;
+              btnConfirm.textContent = 'Updating...';
+              await DB.confirmAttendance(eventId, 'CONFIRMED');
+              UI.showToast('Attendance confirmed! You can now reserve court slots.', 'success');
+              await loadEventData();
+            } catch (e) {
+              btnConfirm.disabled = false;
+              UI.showToast(e.message, 'error');
+            }
+          });
+        }
+
+        const btnDecline = document.getElementById('btn-decline-attendance');
+        if (btnDecline) {
+          btnDecline.addEventListener('click', async () => {
+            try {
+              btnDecline.disabled = true;
+              await DB.confirmAttendance(eventId, 'DECLINED');
+              UI.showToast('Attendance marked as declined.', 'info');
+              await loadEventData();
+            } catch (e) {
+              btnDecline.disabled = false;
+              UI.showToast(e.message, 'error');
+            }
+          });
+        }
+      }
+
+      // 3. Render My Bookings for this Event
+      function renderMyBookings() {
+        const bookings = eventData.userBookings || [];
+        const waitlists = eventData.userWaitlists || [];
+
+        if (bookings.length === 0 && waitlists.length === 0) {
+          myBookingsContainer.style.display = 'none';
+          return;
+        }
+
+        myBookingsContainer.style.display = 'block';
+        myBookingsContainer.innerHTML = `
+          <div class="glass-card" style="padding: var(--space-6); border-color: var(--accent-cyan);">
+            <h3 style="font-size: 1.15rem; color: var(--accent-cyan); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+              <span>🎟️</span> Your Active Slots for this Event (${bookings.length} of ${eventData.max_slots_per_player || 2} Used)
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+              ${bookings.map(b => `
+                <div style="background: var(--bg-primary); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span class="badge badge-emerald" style="margin-bottom: 4px;"><span class="badge-dot"></span> CONFIRMED</span>
+                    <div style="font-weight: 700; color: var(--text-main);">${b.court_name} (${b.sport_name})</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${b.slot_start.substring(11, 16)} – ${b.slot_end.substring(11, 16)} (30 mins)</div>
+                  </div>
+                  <button type="button" class="btn btn-secondary btn-sm btn-cancel-booking" data-booking="${b.booking_id}" style="color: var(--status-rose); border-color: var(--status-rose);">
+                    Cancel
+                  </button>
+                </div>
+              `).join('')}
+              ${waitlists.map(w => `
+                <div style="background: var(--bg-primary); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span class="badge badge-amber" style="margin-bottom: 4px;"><span class="badge-dot"></span> WAITLIST #${w.queue_position}</span>
+                    <div style="font-weight: 700; color: var(--text-main);">${w.court_name} (${w.sport_name})</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${w.slot_start.substring(11, 16)} – ${w.slot_end.substring(11, 16)}</div>
+                  </div>
+                  <span style="font-size: 0.78rem; color: var(--text-dim);">Auto-promotes if vacated</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        myBookingsContainer.querySelectorAll('.btn-cancel-booking').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const bookingId = btn.dataset.booking;
+            if (confirm('Are you sure you want to cancel this slot? Your slot will be immediately offered to waitlisted members.')) {
+              try {
+                btn.disabled = true;
+                await DB.cancelBooking(bookingId);
+                UI.showToast('Booking cancelled. Quota restored.', 'success');
+                await loadEventData();
+              } catch (e) {
+                btn.disabled = false;
+                UI.showToast(e.message, 'error');
+              }
+            }
+          });
+        });
+      }
+
+      // 4. Load Live Slots
+      async function loadSlots() {
+        allSlots = await DB.getEventSlots(eventId, selectedSport);
+        renderCourts();
+        renderSlotsGrid();
+      }
+
+      // 5. Render Courts Tabs
+      function renderCourts() {
+        const courtsMap = {};
+        for (const slot of allSlots) {
+          if (!courtsMap[slot.court_number]) {
+            courtsMap[slot.court_number] = slot.court_name;
+          }
+        }
+
+        const courtNumbers = Object.keys(courtsMap).map(Number).sort((a, b) => a - b);
+        if (!courtNumbers.includes(selectedCourtNum) && courtNumbers.length > 0) {
+          selectedCourtNum = courtNumbers[0];
+        }
+
+        courtTabsContainer.innerHTML = courtNumbers.map(num => `
+          <button class="court-tab-btn ${selectedCourtNum === num ? 'active' : ''}" data-court="${num}">
+            ${courtsMap[num]}
+          </button>
+        `).join('');
+
+        courtTabsContainer.querySelectorAll('.court-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            courtTabsContainer.querySelectorAll('.court-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCourtNum = parseInt(btn.dataset.court, 10);
+            renderSlotsGrid();
+          });
+        });
+      }
+
+      // 6. Render Slots Grid
+      function renderSlotsGrid() {
+        const slotsForCourt = allSlots.filter(s => s.court_number === selectedCourtNum);
+
+        if (slotsForCourt.length === 0) {
+          slotsContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--text-muted);">
+              No court slots configured for this selection.
+            </div>
+          `;
+          return;
+        }
+
+        const myUserBookings = eventData?.userBookings || [];
+        const myBookedSlotIds = myUserBookings.map(b => b.slot_id);
+        const myWaitlistIds = (eventData?.userWaitlists || []).map(w => w.slot_id);
+
+        slotsContainer.innerHTML = slotsForCourt.map(slot => {
+          const isBookedByMe = myBookedSlotIds.includes(slot.id);
+          const isWaitlistedByMe = myWaitlistIds.includes(slot.id);
+          const isFull = slot.booked_count >= slot.max_capacity;
+          const remaining = Math.max(0, slot.max_capacity - slot.booked_count);
+          const timeLabel = `${slot.slot_start.substring(11, 16)} – ${slot.slot_end.substring(11, 16)}`;
+
+          return `
+            <div class="slot-item-card ${isBookedByMe ? 'slot-booked-mine' : ''}">
+              <div class="slot-time-header">
+                <span class="slot-clock">⏰ ${timeLabel}</span>
+                <span class="badge ${isFull ? 'badge-rose' : 'badge-emerald'}">
+                  <span class="badge-dot"></span> ${isFull ? 'FULL' : `${remaining} Spot${remaining > 1 ? 's' : ''} Left`}
+                </span>
+              </div>
+
+              <div class="slot-capacity-status">
+                <span style="color: var(--text-dim);">Capacity (${slot.max_capacity} max):</span>
+                <strong style="color: var(--text-main);">${slot.booked_count} of ${slot.max_capacity} Players</strong>
+              </div>
+
+              <!-- Booked Players Preview -->
+              <div style="min-height: 28px; margin-bottom: 8px;">
+                ${slot.players && slot.players.length > 0 ? slot.players.map(p => `
+                  <span class="booked-player-chip" title="Player ID: ${p.playerId}">
+                    👤 ${p.fullName} (${p.playerId})
+                  </span>
+                `).join('') : '<span style="font-size: 0.78rem; color: var(--text-dim);">No players yet</span>'}
+              </div>
+
+              ${isBookedByMe ? `
+                <div class="badge badge-emerald" style="width: 100%; text-align: center; justify-content: center; padding: 8px;">
+                  ✅ You are Booked in this Slot
+                </div>
+              ` : (isWaitlistedByMe ? `
+                <div class="badge badge-amber" style="width: 100%; text-align: center; justify-content: center; padding: 8px;">
+                  ⏳ You are on the Waitlist
+                </div>
+              ` : `
+                <button type="button" class="btn ${isFull ? 'btn-secondary' : 'btn-outline'} btn-sm btn-block btn-book-slot" 
+                        data-slot="${slot.id}" data-time="${timeLabel}">
+                  ${isFull ? 'Join Waitlist →' : 'Reserve Spot →'}
+                </button>
+              `)}
+            </div>
+          `;
+        }).join('');
+
+        // Attach reservation click listener
+        slotsContainer.querySelectorAll('.btn-book-slot').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!currentUser) {
+              UI.showModal({
+                title: 'Player Account Required',
+                content: '<p>You must log in to reserve a 30-minute court slot.</p>',
+                ctaText: 'Go to Login →',
+                ctaHref: 'login.html'
+              });
+              return;
+            }
+
+            if (eventData.userAttendance !== 'CONFIRMED') {
+              UI.showModal({
+                title: 'Attendance Confirmation Required',
+                content: '<p>Under the approved project framework, you must confirm your event attendance before reserving slots. Please click "Confirm My Attendance" at the top of the page.</p>',
+                ctaText: 'Confirm Attendance Now',
+                ctaHref: '#'
+              });
+              return;
+            }
+
+            const slotId = btn.dataset.slot;
+            try {
+              btn.disabled = true;
+              btn.textContent = 'Securing spot...';
+              const res = await DB.bookSlot(slotId);
+              UI.showToast(res.message, res.status === 'CONFIRMED' ? 'success' : 'info');
+              await loadEventData();
+            } catch (err) {
+              btn.disabled = false;
+              btn.textContent = 'Reserve Spot →';
+              UI.showToast(err.message, 'error');
+            }
+          });
+        });
+      }
+
+      // Sport Switcher buttons
+      document.querySelectorAll('.sport-filter-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.sport-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedSport = btn.dataset.sport;
+          selectedCourtNum = 1;
+          await loadSlots();
+        });
+      });
+
+      // Initial Execution
+      await loadEventData();
+    });
+  </script>
+</body>
+</html>

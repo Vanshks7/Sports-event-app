@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events Calendar (2026–2027) — Community Multisports Series</title>
+  <meta name="description" content="View the complete year-long schedule of community multi-sport events running every ~15 days from October 2026 to October 2027. Check booking window statuses.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .events-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      padding: var(--space-4) var(--space-6);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+
+    .filter-pills-group {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xs);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: #121214;
+      border-color: #121214;
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    
+    <!-- PAGE HERO -->
+    <section class="section" style="padding-bottom: var(--space-6);">
+      <div class="container">
+        <div class="section-header" style="margin-bottom: var(--space-4);">
+          <div class="section-tag">
+            Fortnightly Cadence
+          </div>
+          <h1 class="section-title">
+            2026–2027 Series Calendar
+          </h1>
+          <p class="section-subtitle">
+            One event approximately every 15 days for the next year. 
+            Confirm attendance closer to each event instead of committing months in advance.
+          </p>
+        </div>
+
+        <div class="alert alert-info" style="max-width: 860px; margin: 0 auto var(--space-8) auto;">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>Booking Window Timing Policy:</strong> For each round, slot bookings open <strong>7 days before</strong> the event date and close <strong>48 hours before</strong> to lock attendance and finalize match pairings. Register your permanent player account once to be eligible for all rounds.
+          </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="events-filter-bar">
+          <div class="filter-pills-group">
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-right: 8px; align-self: center;">Filter:</span>
+            <button class="filter-btn active" data-filter="all">All Events</button>
+            <button class="filter-btn" data-filter="REGISTRATION_OPEN">Phase 1 Active</button>
+            <button class="filter-btn" data-filter="UPCOMING">Upcoming Rounds</button>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-dim);" id="event-count-display">
+            Showing all 24 events
+          </div>
+        </div>
+
+        <!-- EVENTS GRID -->
+        <div id="events-grid-container" class="grid-3">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CADENCE REMINDER SECTION -->
+    <section class="section" style="background: var(--bg-secondary);">
+      <div class="container-narrow">
+        <div class="glass-card" style="padding: var(--space-8);">
+          <h3 style="margin-bottom: var(--space-4); color: var(--accent-cyan);">
+            Why Fortnightly Event-Wise Confirmation?
+          </h3>
+          <p style="margin-bottom: var(--space-4);">
+            Under the approved project framework, players maintain a permanent account while committing to each event on a 15-day cadence. This avoids high no-show rates that occur when asking community members for months-long advance commitments.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-4);">
+            <div style="background: var(--bg-primary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-main);">Permanent Account:</strong>
+              <p style="font-size: 0.85rem; margin-top: 4px;">Never re-register. Your Unique Player ID (e.g. MP1001) persists forever.</p>
+            </div>
+            <div style="background: var(--bg-primary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--accent-amber);">Event-Wise Slot Booking:</strong>
+              <p style="font-size: 0.85rem; margin-top: 4px;">Choose up to two 30-minute slots when the 7-day booking window opens.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      UI.renderNavbar('events');
+      UI.renderFooter();
+
+      const container = document.getElementById('events-grid-container');
+      const countDisplay = document.getElementById('event-count-display');
+
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px;">
+          <p style="font-size: 1.1rem; color: var(--text-muted);">⏳ Loading schedule from database...</p>
+        </div>
+      `;
+
+      const events = await DB.getEvents();
+
+      const renderEvents = (filter = 'all') => {
+        let filtered = events;
+        if (filter !== 'all') {
+          filtered = events.filter(e => e.status === filter);
+        }
+
+        countDisplay.textContent = `Showing ${filtered.length} of ${events.length} events`;
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px; background: var(--bg-card); border-radius: var(--radius-lg);">
+              <p style="font-size: 1.1rem; color: var(--text-muted);">No events found matching this filter.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered.map(ev => UI.createEventCard(ev)).join('');
+      };
+
+      // Initial render
+      renderEvents('all');
+
+      // Filter button clicks
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderEvents(btn.dataset.filter);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

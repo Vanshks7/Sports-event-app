@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permanent Player Registration — Community Multisports Series</title>
+  <meta name="description" content="One-time permanent player registration for the 2026-2027 Community Multisports Series. Receive your Unique Player ID (MP/FP) to book 30-minute slots.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .registration-wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .form-section-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--border-medium);
+      padding-bottom: 8px;
+      margin-bottom: var(--space-4);
+      margin-top: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 640px) {
+      .form-grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .demo-fill-card {
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-xs);
+      padding: 12px 16px;
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Success Card */
+    .success-card {
+      display: none;
+      text-align: center;
+      padding: var(--space-12) var(--space-8);
+      background: var(--bg-card);
+      border: 1px solid var(--status-emerald);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .success-badge-display {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 32px;
+      background: var(--bg-secondary);
+      border: 2px dashed var(--text-main);
+      border-radius: var(--radius-xs);
+      margin: 24px 0;
+    }
+
+    .player-id-large {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    <div class="container section">
+      <div class="registration-wrapper">
+
+        <!-- REGISTRATION FORM CONTAINER -->
+        <div id="form-container" class="glass-card" style="padding: var(--space-8);">
+          
+          <div class="section-tag">
+            Phase 1: Permanent Profile
+          </div>
+          <h1 style="font-size: 2.2rem; margin-bottom: 8px;">
+            One-Time Player Registration
+          </h1>
+          <p style="color: var(--text-muted); margin-bottom: var(--space-6);">
+            Create your permanent profile once. Your Unique Player ID (MP/FP) will grant you access to confirm attendance and reserve court-slots across all 24 events in the 2026–2027 series.
+          </p>
+
+          <!-- 1-Click Fast Fill for Testing -->
+          <div class="demo-fill-card">
+            <div>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">⚡ Quick Demo Mode</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Fill valid, ready-to-register test details in one click.</div>
+            </div>
+            <button type="button" id="btn-fill-demo" class="btn btn-secondary btn-sm" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">
+              ✨ Auto-Fill Sample Player
+            </button>
+          </div>
+
+          <!-- Alert Container for dynamic feedback -->
+          <div id="form-alert-container"></div>
+
+          <form id="player-registration-form" novalidate>
+            
+            <!-- SECTION A: PERSONAL & CONTACT DETAILS -->
+            <div class="form-section-title">
+              <span>👤</span> Personal & Contact Information
+            </div>
+
+            <div class="form-group">
+              <label for="fullName" class="form-label">
+                <span>Full Legal Name <span class="req">*</span></span>
+              </label>
+              <input type="text" id="fullName" class="form-input" placeholder="e.g., Rohan Shah" required>
+              <span class="form-helper">As displayed on your community match pass and event rosters.</span>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="email" class="form-label">
+                  <span>Email Address <span class="req">*</span></span>
+                </label>
+                <input type="email" id="email" class="form-input" placeholder="rohan.shah@example.com" required>
+                <span class="form-helper">Used for login, schedule updates & booking notifications.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="phone" class="form-label">
+                  <span>Mobile Phone Number <span class="req">*</span></span>
+                </label>
+                <input type="tel" id="phone" class="form-input" placeholder="+91 98200 55443" required>
+                <span class="form-helper">Used for WhatsApp booking reminders and check-in SMS.</span>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="gender" class="form-label">
+                  <span>Gender Category <span class="req">*</span></span>
+                </label>
+                <select id="gender" class="form-select" required>
+                  <option value="" disabled selected>Select category...</option>
+                  <option value="MALE">Male (Assigns MP prefix)</option>
+                  <option value="FEMALE">Female (Assigns FP prefix)</option>
+                  <option value="OTHER">Other / Non-Binary (Assigns JP prefix)</option>
+                </select>
+                <span class="form-helper">Determines your deterministic Unique Player ID prefix.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="ageGroup" class="form-label">
+                  <span>Age Category</span>
+                </label>
+                <select id="ageGroup" class="form-select">
+                  <option value="18-25">18–25 years</option>
+                  <option value="26-35" selected>26–35 years</option>
+                  <option value="36-50">36–50 years</option>
+                  <option value="50+">50+ Masters</option>
+                  <option value="Junior">Junior (Under 18)</option>
+                </select>
+                <span class="form-helper">Enables fair, competitive doubles matchmaking.</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="emergencyContact" class="form-label">
+                <span>Emergency Contact Name & Phone</span>
+              </label>
+              <input type="text" id="emergencyContact" class="form-input" placeholder="e.g. Suresh Shah (+91 98200 99999)">
+            </div>
+
+            <!-- SECTION B: ACCOUNT PASSWORD (SEAMLESS ACTIVATION) -->
+            <div class="form-section-title">
+              <span>🔐</span> Set Account Password
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-dim); margin-bottom: 12px;">
+              Set your private password now to activate your permanent player profile immediately. (Minimum 8 characters)
+            </p>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="password" class="form-label">
+                  <span>Password <span class="req">*</span></span>
+                </label>
+                <input type="password" id="password" class="form-input" placeholder="At least 8 characters" minlength="8" required>
+                <span class="form-helper">Never shared; securely hashed with bcrypt.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword" class="form-label">
+                  <span>Confirm Password <span class="req">*</span></span>
+                </label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter password" minlength="8" required>
+                <span class="form-helper" id="password-match-helper">Must match password above.</span>
+              </div>
+            </div>
+
+            <!-- SECTION C: SPORTS PREFERENCES -->
+            <div class="form-section-title">
+              <span>🏅</span> Sport Preferences & Skill Self-Assessment
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-dim); margin-bottom: 12px;">
+              Select all sports you are interested in playing during the series (choose at least one):
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+              <label class="form-checkbox-card">
+                <input type="checkbox" name="sports" value="pickleball" id="sport-pickleball" checked>
+                <div style="flex: 1;">
+                  <strong style="color: var(--text-main);">Pickleball</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">10 Courts • Doubles (4 players per 30-min slot)</div>
+                </div>
+                <select id="skill-pickleball" class="form-select" style="width: auto; padding: 4px 10px; font-size: 0.85rem;">
+                  <option value="BEGINNER">Beginner</option>
+                  <option value="INTERMEDIATE" selected>Intermediate</option>
+                  <option value="ADVANCED">Advanced</option>
+                </select>
+              </label>
+
+              <label class="form-checkbox-card">
+                <input type="checkbox" name="sports" value="paddle_ball" id="sport-paddle">
+                <div style="flex: 1;">
+                  <strong style="color: var(--text-main);">Paddle Ball (Pádel)</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Enclosed Glass Arena • Doubles (4 players per 30-min slot)</div>
+                </div>
+                <select id="skill-paddle" class="form-select" style="width: auto; padding: 4px 10px; font-size: 0.85rem;">
+                  <option value="BEGINNER">Beginner</option>
+                  <option value="INTERMEDIATE" selected>Intermediate</option>
+                  <option value="ADVANCED">Advanced</option>
+                </select>
+              </label>
+
+              <label class="form-checkbox-card">
+                <input type="checkbox" name="sports" value="box_cricket" id="sport-cricket">
+                <div style="flex: 1;">
+                  <strong style="color: var(--text-main);">Box Cricket</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Turf Cage Arena • Match Squads (14 players per slot)</div>
+                </div>
+                <select id="skill-cricket" class="form-select" style="width: auto; padding: 4px 10px; font-size: 0.85rem;">
+                  <option value="BEGINNER">Beginner</option>
+                  <option value="INTERMEDIATE">Intermediate</option>
+                  <option value="ADVANCED" selected>Advanced</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- SECTION D: COMMUNITY CODE OF CONDUCT -->
+            <div class="form-section-title">
+              <span>📜</span> Terms & Attendance Policy
+            </div>
+
+            <label class="form-checkbox-card" style="margin-bottom: 24px;">
+              <input type="checkbox" id="termsAgree" required checked>
+              <div style="font-size: 0.88rem; color: var(--text-muted);">
+                I understand that registration is permanent for the 2026–2027 series. I agree to the <a href="help.html#rules" target="_blank">Two-Slot Quota Limit</a> per event and commit to canceling any confirmed reservation at least 48 hours prior to allow waitlisted members to play.
+              </div>
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-btn">
+              Create Permanent Player Account →
+            </button>
+          </form>
+
+        </div>
+
+        <!-- SUCCESS SCREEN (REPLACES FORM UPON REGISTRATION) -->
+        <div id="success-container" class="success-card">
+          <div style="font-size: 3.2rem; margin-bottom: 12px;">🎉</div>
+          <span class="badge badge-emerald" style="margin-bottom: 12px;"><span class="badge-dot"></span> Registration Confirmed & Active</span>
+          <h2 style="font-size: 2.2rem; margin-bottom: 8px;">Welcome to the Series!</h2>
+          <p style="color: var(--text-muted); max-width: 540px; margin: 0 auto;">
+            Your permanent player profile has been assigned and recorded in the community database. You will not need to re-register for future events.
+          </p>
+
+          <div class="success-badge-display">
+            <span style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em;">
+              Your Permanent Player Identifier
+            </span>
+            <span class="player-id-large" id="registered-player-id">MP1007</span>
+            <span style="font-size: 1rem; color: var(--accent-cyan); font-weight: 600;" id="registered-name-display">Rohan Shah</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="registered-email-display">rohan.shah@example.com</span>
+          </div>
+
+          <div id="success-action-area" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="events.html" class="btn btn-primary btn-lg">View Upcoming Event Schedule →</a>
+            <a href="login.html" class="btn btn-secondary btn-lg">Go to Login Screen</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      UI.renderNavbar('register');
+      UI.renderFooter();
+
+      const form = document.getElementById('player-registration-form');
+      const formContainer = document.getElementById('form-container');
+      const successContainer = document.getElementById('success-container');
+      const playerIdDisplay = document.getElementById('registered-player-id');
+      const nameDisplay = document.getElementById('registered-name-display');
+      const emailDisplay = document.getElementById('registered-email-display');
+      const alertContainer = document.getElementById('form-alert-container');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnFillDemo = document.getElementById('btn-fill-demo');
+
+      // Auto-Fill sample player helper for quick testing
+      if (btnFillDemo) {
+        btnFillDemo.addEventListener('click', () => {
+          const rand = Math.floor(1000 + Math.random() * 9000);
+          document.getElementById('fullName').value = `Siddharth Jain`;
+          document.getElementById('email').value = `siddharth.jain${rand}@example.com`;
+          document.getElementById('phone').value = `+91 98200 ${rand}`;
+          document.getElementById('gender').value = 'MALE';
+          document.getElementById('ageGroup').value = '26-35';
+          document.getElementById('emergencyContact').value = 'Mahesh Jain (+91 98200 99887)';
+          document.getElementById('password').value = 'PlayerPass2026!';
+          document.getElementById('confirmPassword').value = 'PlayerPass2026!';
+          document.getElementById('sport-pickleball').checked = true;
+          document.getElementById('sport-paddle').checked = true;
+          document.getElementById('termsAgree').checked = true;
+          UI.showToast('Demo player details loaded. Ready to submit!', 'info');
+        });
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertContainer.innerHTML = '';
+
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const gender = document.getElementById('gender').value;
+        const ageGroup = document.getElementById('ageGroup').value;
+        const emergencyContact = document.getElementById('emergencyContact').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const termsAgree = document.getElementById('termsAgree').checked;
+
+        // Validation
+        if (!fullName || !email || !phone || !gender) {
+          UI.showToast('Please fill in all mandatory fields (*)', 'warning');
+          return;
+        }
+
+        if (password) {
+          if (password.length < 8) {
+            UI.showToast('Password must be at least 8 characters long.', 'warning');
+            return;
+          }
+          if (password !== confirmPassword) {
+            UI.showToast('Passwords do not match. Please re-enter.', 'error');
+            return;
+          }
+        }
+
+        if (!termsAgree) {
+          UI.showToast('Please agree to the series attendance and conduct terms.', 'warning');
+          return;
+        }
+
+        // Selected sports
+        const selectedSports = [];
+        document.querySelectorAll('input[name="sports"]:checked').forEach(cb => {
+          selectedSports.push(cb.value);
+        });
+
+        if (selectedSports.length === 0) {
+          UI.showToast('Please select at least one sport of interest.', 'warning');
+          return;
+        }
+
+        const skillLevel = {
+          pickleball: document.getElementById('skill-pickleball').value,
+          paddle_ball: document.getElementById('skill-paddle').value,
+          box_cricket: document.getElementById('skill-cricket').value
+        };
+
+        // UI loading state
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Creating Permanent Profile...';
+
+        try {
+          // Register player through data layer
+          const newPlayer = await DB.registerPlayer({
+            fullName,
+            email,
+            phone,
+            gender,
+            ageGroup,
+            emergencyContact,
+            sports: selectedSports,
+            skillLevel,
+            password: password || undefined
+          });
+
+          // Show Success State
+          formContainer.style.display = 'none';
+          successContainer.style.display = 'block';
+
+          const assignedId = newPlayer.playerId || newPlayer.player_id;
+          playerIdDisplay.textContent = assignedId;
+          nameDisplay.textContent = newPlayer.fullName || newPlayer.full_name;
+          emailDisplay.textContent = newPlayer.email;
+
+          UI.showToast(`Account created! Permanent Unique Player ID: ${assignedId}`, 'success');
+
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+
+          if (err.status === 409 || err.message.includes('already registered')) {
+            alertContainer.innerHTML = `
+              <div class="alert alert-warning" style="margin-bottom: 20px;">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                  <strong>Account Already Exists:</strong> ${err.message}<br>
+                  <a href="login.html" style="color: var(--accent-cyan); font-weight: 600; text-decoration: underline; margin-top: 4px; display: inline-block;">
+                    Click here to Log In with your existing account →
+                  </a>
+                </div>
+              </div>
+            `;
+          } else {
+            UI.showToast(err.message || 'Registration failed. Please try again.', 'error');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

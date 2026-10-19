@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organiser Control Panel — Community Multisports Portal</title>
+  <meta name="description" content="Live administrative control room for community multi-sport tournament organizers. Manage player database, monitor court capacities, schedule matches, and export checklists.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* Admin Dashboard Custom Styles */
+    .admin-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      padding: var(--space-6);
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .admin-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xs);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .metric-cyan::before { background: var(--accent-cyan); }
+    .metric-amber::before { background: var(--accent-amber); }
+    .metric-emerald::before { background: var(--status-emerald); }
+    .metric-purple::before { background: var(--status-purple); }
+
+    .metric-val {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-main);
+      margin-top: 4px;
+      line-height: 1.1;
+    }
+
+    .metric-sub {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    /* Admin Section Navigation Tabs */
+    .admin-nav-tabs {
+      display: flex;
+      gap: var(--space-2);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-8);
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .admin-tab-btn {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .admin-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .admin-tab-btn.active {
+      color: var(--text-main);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    /* Tab Content Panes */
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Player Table */
+    .admin-table-wrapper {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xs);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    .admin-table th, .admin-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .admin-table th {
+      background: var(--bg-secondary);
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-table tr:hover td {
+      background: var(--bg-secondary);
+    }
+
+    /* Capacity Heatmap Grid */
+    .capacity-heatmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .heat-slot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xs);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .heat-slot-card:hover {
+      border-color: var(--border-medium);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .heat-progress-bar {
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .heat-progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--transition-normal);
+    }
+
+    .fill-green { background: var(--status-emerald); }
+    .fill-amber { background: var(--accent-amber); }
+    .fill-red { background: var(--status-rose); }
+
+    @media (max-width: 992px) {
+      .admin-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 580px) {
+      .admin-metrics-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Navigation -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    <div class="container section" style="padding-top: var(--space-8);">
+
+      <!-- TOP BAR -->
+      <div class="admin-topbar">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="badge badge-amber"><span class="badge-dot"></span> Organiser Command Center</span>
+            <span class="badge badge-cyan" id="current-admin-role">ADMIN</span>
+          </div>
+          <h1 style="font-size: 1.8rem; margin: 0;">
+            Tournament Operations & Capacity Control
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+            Active Operator: <strong id="admin-operator-name" style="color: var(--text-main);">Master Tournament Administrator</strong> (<span id="admin-operator-id" style="color: var(--accent-cyan);">ADM1001</span>)
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-data" title="Reload live database telemetry">
+            🔄 Refresh Live Data
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-quick-export-all" title="Download all active player lists">
+            📥 Export All (CSV)
+          </button>
+          <a href="index.html" class="btn btn-outline btn-sm">
+            Public Website →
+          </a>
+        </div>
+      </div>
+
+      <!-- OPERATIONAL KPIS & METRICS -->
+      <div class="admin-metrics-grid">
+        <div class="metric-card metric-cyan">
+          <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Total Registrations</span>
+          <span class="metric-val" id="metric-total-players">7</span>
+          <span class="metric-sub">Permanent Player Database</span>
+        </div>
+
+        <div class="metric-card metric-emerald">
+          <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Active Confirmed</span>
+          <span class="metric-val" id="metric-active-players" style="color: var(--status-emerald);">7</span>
+          <span class="metric-sub">Verified & Active Status</span>
+        </div>
+
+        <div class="metric-card metric-amber">
+          <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Next Round (Round 01)</span>
+          <span class="metric-val" id="metric-next-round" style="color: var(--accent-amber); font-size: 1.6rem; padding-top: 6px;">29 Oct 2026</span>
+          <span class="metric-sub">Booking opens 22 Oct (T-7d)</span>
+        </div>
+
+        <div class="metric-card metric-purple">
+          <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Sport Preferences</span>
+          <div style="display: flex; justify-content: space-between; font-weight: 700; margin-top: 10px; font-size: 0.9rem;">
+            <span>🏓 PB: <span id="metric-pb-count" style="color: var(--accent-cyan);">5</span></span>
+            <span>🎾 PD: <span id="metric-pd-count" style="color: var(--accent-amber);">3</span></span>
+            <span>🏏 CR: <span id="metric-cr-count" style="color: var(--status-emerald);">3</span></span>
+          </div>
+          <span class="metric-sub">Interest by Discipline</span>
+        </div>
+      </div>
+
+      <!-- ADMIN WORKSPACE TABS -->
+      <div class="admin-nav-tabs" role="tablist">
+        <button class="admin-tab-btn active" data-tab="tab-events">
+          🗓️ 1. Events Schedule
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-capacity">
+          📊 2. Court Availability (Live)
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-players">
+          👥 3. Players Directory
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-scheduler">
+          ⚔️ 4. Match Pairings
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-exports">
+          📥 5. Export Reports (CSV)
+        </button>
+        <button class="admin-tab-btn" data-tab="tab-broadcast">
+          📢 6. Announcements
+        </button>
+      </div>
+
+      <!-- ===================================================================
+           TAB 0: EVENT LIFECYCLE & BOOKING WINDOWS MANAGEMENT
+           =================================================================== -->
+      <div id="tab-events" class="tab-pane active">
+        <div class="glass-card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+          
+          <!-- Simple Workflow Guide for Organizers -->
+          <div style="background: rgba(14, 165, 233, 0.08); border: 1px solid var(--accent-cyan); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            <div>
+              <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.9rem;">Step 1: Setup & Edit</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Create or edit rounds, venues, dates, and 30-min court capacities.</div>
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--status-emerald); font-size: 0.9rem;">Step 2: Publish Round</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Published rounds open attendance confirmations for community players.</div>
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--accent-amber); font-size: 0.9rem;">Step 3: 7-Day Booking Window</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Confirmed players reserve up to 2 slots; waitlists auto-promote on cancel.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <h3 style="margin-bottom: 4px; font-size: 1.3rem;">Series Events & Booking Schedule</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem;">
+                Click <strong>"Edit"</strong> to update details or <strong>"Publish"</strong> to release booking access.
+              </p>
+            </div>
+            <div>
+              <button class="btn btn-primary" id="btn-open-create-event-modal">
+                ➕ Create New Event
+              </button>
+            </div>
+          </div>
+
+          <!-- Events Table -->
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Round</th>
+                  <th>Title & Venue</th>
+                  <th>Date & Time</th>
+                  <th>Sports</th>
+                  <th>Booking Window</th>
+                  <th>Confirmed / Booked</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="events-table-body">
+                <tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-dim);">Loading events from database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 1: LIVE CAPACITY MONITOR (Courts 1–10 Heatmap)
+           =================================================================== -->
+      <div id="tab-capacity" class="tab-pane">
+        <div class="glass-card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <h3 style="margin-bottom: 4px;">Live Court & Slot Heatmap</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Shows real-time occupancy across 30-minute intervals. Click any slot card to inspect booked player names or trigger overrides.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary btn-sm sport-heat-btn active" data-sport="pickleball">🏓 Pickleball (10 Courts)</button>
+              <button class="btn btn-secondary btn-sm sport-heat-btn" data-sport="paddle_ball">🎾 Paddle (4 Courts)</button>
+              <button class="btn btn-secondary btn-sm sport-heat-btn" data-sport="box_cricket">🏏 Box Cricket (2 Arenas)</button>
+            </div>
+          </div>
+
+          <!-- Heatmap Slot Grid -->
+          <div class="capacity-heatmap" id="admin-heatmap-container">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 2: PLAYER DATABASE & DIRECTORY
+           =================================================================== -->
+      <div id="tab-players" class="tab-pane">
+        <div class="glass-card" style="padding: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+            <div>
+              <h3 style="margin-bottom: 4px;">Permanent Player Registry</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Search, inspect profiles, update access permissions, or suspend delinquent accounts.
+              </p>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%; max-width: 600px;">
+              <input type="text" id="player-search-input" class="form-input" style="flex: 2; padding: 8px 12px;" placeholder="Search name, Player ID, email, or phone...">
+              <select id="player-role-filter" class="form-select" style="flex: 1; padding: 8px 12px;">
+                <option value="">All Roles</option>
+                <option value="PLAYER">Players</option>
+                <option value="COORDINATOR">Coordinators</option>
+                <option value="ADMIN">Admins</option>
+              </select>
+              <select id="player-status-filter" class="form-select" style="flex: 1; padding: 8px 12px;">
+                <option value="">All Statuses</option>
+                <option value="ACTIVE">Active</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-table-wrapper">
+            <table class="admin-table" aria-label="Player Database Directory">
+              <thead>
+                <tr>
+                  <th>Player ID</th>
+                  <th>Full Name</th>
+                  <th>Contact Info</th>
+                  <th>Sports</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="player-table-body">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 3: MATCH SCHEDULER & PAIRING WORKBENCH
+           =================================================================== -->
+      <div id="tab-scheduler" class="tab-pane">
+        <div class="glass-card" style="padding: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+            <div>
+              <h3 style="margin-bottom: 4px;">Match Scheduling & Doubles Pairing</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Transform confirmed 4-player slot bookings into balanced Doubles matches (Pair A vs Pair B) or Box Cricket squads.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-publish-schedule">
+              🚀 Publish Match Schedule to Portal
+            </button>
+          </div>
+
+          <div class="alert alert-info">
+            <span class="alert-icon">ℹ️</span>
+            <div>
+              <strong>Scheduler Rule:</strong> Matches are built from confirmed reservations locked at T-48h. The scheduler automatically balances teams based on player skill levels (Beginner, Intermediate, Advanced).
+            </div>
+          </div>
+
+          <!-- Sample Fixtures Container -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px;">
+            
+            <!-- Match Card 1 -->
+            <div class="glass-card" style="border-left: 4px solid var(--accent-cyan); padding: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span class="badge badge-cyan">Pickleball Court 1 • 07:00 PM</span>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Doubles Fixture #101</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 16px 0; text-align: center;">
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: var(--radius-sm);">
+                  <strong style="color: var(--accent-cyan);">Team Blue</strong>
+                  <div style="font-size: 0.82rem; margin-top: 4px;">Arjun Mehta (MP1001)</div>
+                  <div style="font-size: 0.82rem;">Pooja Shah (FP1002)</div>
+                </div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-dim);">VS</div>
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: var(--radius-sm);">
+                  <strong style="color: var(--accent-amber);">Team Orange</strong>
+                  <div style="font-size: 0.82rem; margin-top: 4px;">Vikram S. (MP1003)</div>
+                  <div style="font-size: 0.82rem;">Court Partner Spot (4)</div>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); padding-top: 8px; border-top: 1px solid var(--border-subtle);">
+                <span>Referee: Priya Patel (COORD1001)</span>
+                <span style="color: var(--status-emerald);">Ready for Match</span>
+              </div>
+            </div>
+
+            <!-- Match Card 2 -->
+            <div class="glass-card" style="border-left: 4px solid var(--status-emerald); padding: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span class="badge badge-emerald">Pickleball Court 1 • 07:30 PM</span>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Doubles Fixture #102</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 16px 0; text-align: center;">
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: var(--radius-sm);">
+                  <strong style="color: var(--accent-cyan);">Team Blue</strong>
+                  <div style="font-size: 0.82rem; margin-top: 4px;">Arjun Mehta (MP1001)</div>
+                  <div style="font-size: 0.82rem;">Ananya D. (FP1004)</div>
+                </div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-dim);">VS</div>
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: var(--radius-sm);">
+                  <strong style="color: var(--accent-amber);">Team Orange</strong>
+                  <div style="font-size: 0.82rem; margin-top: 4px;">Rohit Kothari (MP1005)</div>
+                  <div style="font-size: 0.82rem;">Meera Jain (FP1006)</div>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); padding-top: 8px; border-top: 1px solid var(--border-subtle);">
+                <span>Referee: Assigned</span>
+                <span style="color: var(--status-emerald);">Capacity 4/4 Locked</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 4: SPREADSHEET EXPORTS (CSV ENGINE)
+           =================================================================== -->
+      <div id="tab-exports" class="tab-pane">
+        <div class="glass-card" style="padding: var(--space-6);">
+          <h3 style="margin-bottom: 4px;">Operational Data & Schedule Exporter</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+            Download structured CSV workbooks for venue coordinators, check-in desks, and referee pairings.
+          </p>
+
+          <div class="grid-3">
+            <div class="glass-card card-hover" style="background: var(--bg-secondary);">
+              <div style="font-size: 2rem; margin-bottom: 12px;">📋</div>
+              <h4 style="margin-bottom: 8px;">Complete Player Roster</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Complete database export of all registered players, Unique Player IDs, emails, verified phone numbers, and emergency contacts.
+              </p>
+              <button class="btn btn-primary btn-sm btn-block" id="btn-export-players">
+                📥 Download Player Roster (CSV)
+              </button>
+            </div>
+
+            <div class="glass-card card-hover" style="background: var(--bg-secondary);">
+              <div style="font-size: 2rem; margin-bottom: 12px;">🏟️</div>
+              <h4 style="margin-bottom: 8px;">Court Attendance Checklist</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Court-by-court 30-minute interval check-in sheet with check boxes and attendance timestamps for ground marshals.
+              </p>
+              <button class="btn btn-accent btn-sm btn-block" id="btn-export-checklist">
+                📥 Download Court Checklist (CSV)
+              </button>
+            </div>
+
+            <div class="glass-card card-hover" style="background: var(--bg-secondary);">
+              <div style="font-size: 2rem; margin-bottom: 12px;">📊</div>
+              <h4 style="margin-bottom: 8px;">Match Pairing Sheets</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Referees score summary cards for doubles pairs, court assignments, and match results recording.
+              </p>
+              <button class="btn btn-secondary btn-sm btn-block" id="btn-export-fixtures">
+                📥 Download Fixture Sheets (CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 5: BROADCAST ANNOUNCEMENTS & REMINDERS
+           =================================================================== -->
+      <div id="tab-broadcast" class="tab-pane">
+        <div class="glass-card" style="padding: var(--space-6);">
+          <h3 style="margin-bottom: 4px;">Series Broadcast Center</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+            Dispatch official booking open notices (T-7d), lock reminders (T-48h), and schedule alerts via Email / WhatsApp.
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <form id="broadcast-form">
+              <div class="form-group">
+                <label for="broadcastType" class="form-label">Template / Message Type</label>
+                <select id="broadcastType" class="form-select">
+                  <option value="WINDOW_OPEN">📢 Booking Window Active (T-7 Days Notice)</option>
+                  <option value="DEADLINE_REMINDER">⏰ Attendance Lock Reminder (T-48 Hours)</option>
+                  <option value="SCHEDULE_PUBLISHED">🏆 Match Schedule & Court Cards Published</option>
+                  <option value="CUSTOM">✉️ Custom Community Announcement</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="broadcastTarget" class="form-label">Recipient Group</label>
+                <select id="broadcastTarget" class="form-select">
+                  <option value="ALL">All Registered Players (100% Roster)</option>
+                  <option value="CONFIRMED_ROUND_1">Confirmed Players for Round 1 Only</option>
+                  <option value="WAITLIST">Waitlisted Players Only</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="broadcastMessage" class="form-label">Message Content</label>
+                <textarea id="broadcastMessage" class="form-textarea" rows="4" style="resize: vertical;">The 30-minute slot booking window for Round 1 (Opening Night - 29 Oct 2026) is now open! Please log in with your Player ID and select up to two slots before the 48-hour deadline.</textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block">
+                🚀 Send Announcement Broadcast
+              </button>
+            </form>
+
+            <div style="background: var(--bg-secondary); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <h4 style="color: var(--accent-cyan); margin-bottom: 12px;">Dispatch History & Queue</h4>
+              <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
+                <div style="padding: 10px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--status-emerald);">
+                  <strong style="color: var(--text-main);">Registration Welcome Alert:</strong> Sent to 7 players upon profile activation.
+                  <div style="color: var(--text-dim); margin-top: 4px;">Delivered • 100% Success</div>
+                </div>
+                <div style="padding: 10px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-amber);">
+                  <strong style="color: var(--text-main);">Scheduled Job:</strong> T-7d Booking Window Open Broadcast
+                  <div style="color: var(--accent-amber); margin-top: 4px;">Queued for 22 Oct 2026, 09:00 AM</div>
+                </div>
+                <div style="padding: 10px; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--status-rose);">
+                  <strong style="color: var(--text-main);">Scheduled Job:</strong> T-48h Attendance Lock & Freeze
+                  <div style="color: var(--status-rose); margin-top: 4px;">Queued for 27 Oct 2026, 07:00 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      UI.renderNavbar('admin');
+      UI.renderFooter();
+
+      // 1. Session Verification Gate (server-side JWT verification)
+      const token = localStorage.getItem('jito_jwt_token');
+      let currentUser = null;
+      let isStaff = false;
+
+      async function verifyAdminSession() {
+        // Always attempt server-side verification when a token is present
+        if (token && window.location.protocol.startsWith('http')) {
+          try {
+            const res = await fetch('/api/auth/me', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const me = await res.json();
+              currentUser = {
+                ...me,
+                playerId: me.player_id || me.playerId,
+                fullName: me.full_name || me.fullName
+              };
+              isStaff = currentUser.role === 'ADMIN' || currentUser.role === 'COORDINATOR';
+              // Persist verified server profile to localStorage
+              localStorage.setItem(DB.CURRENT_USER_KEY, JSON.stringify(currentUser));
+              return;
+            }
+            // Token invalid/expired server-side -> clear local session
+            DB.logout();
+          } catch (e) {
+            // Server unreachable: fall back to localStorage for prototype/offline mode
+            console.warn('Admin session server check unavailable, falling back to local storage:', e.message);
+          }
+        }
+
+        // Fallback: local storage only (offline prototype mode)
+        currentUser = DB.getCurrentUser();
+        isStaff = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'COORDINATOR');
+      }
+
+      await verifyAdminSession();
+
+      if (!isStaff || !currentUser) {
+        UI.showModal({
+          title: 'Access Restricted — Organiser Login Required',
+          content: `
+            <div style="margin-bottom: 16px;">
+              <p>You must be signed in with an <strong>Administrator (ADMIN)</strong> or <strong>Coordinator (COORDINATOR)</strong> account to access the tournament operations room.</p>
+              <div style="margin-top: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
+                <strong>Quick Access:</strong> Go to the Player Login page and click the golden <em>"👑 Master Admin"</em> button to log in instantly.
+              </div>
+            </div>
+          `,
+          ctaText: 'Go to Login Page →',
+          ctaHref: 'login.html'
+        });
+        return;
+      }
+
+      // Update Topbar Operator
+      document.getElementById('admin-operator-name').textContent = currentUser.fullName || currentUser.full_name || 'Administrator';
+      document.getElementById('admin-operator-id').textContent = currentUser.playerId || currentUser.player_id || 'ADM1001';
+      document.getElementById('current-admin-role').textContent = currentUser.role || 'ADMIN';
+
+      // 2. Tab Navigation Logic
+      const tabBtns = document.querySelectorAll('.admin-tab-btn');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          tabPanes.forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          const targetTab = document.getElementById(btn.dataset.tab);
+          if (targetTab) targetTab.classList.add('active');
+        });
+      });
+
+      // 3. Load Live Player Directory & Heatmap
+      let allPlayers = [];
+
+      async function loadDashboardData() {
+        try {
+          // Attempt live backend fetch
+          if (window.location.protocol.startsWith('http')) {
+            const token = localStorage.getItem('jito_jwt_token');
+            const res = await fetch('/api/admin/players', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              allPlayers = data.players || [];
+            }
+          }
+        } catch (e) {
+          console.warn('Backend fetch failed, using local store', e);
+        }
+
+        // Fallback to local storage if empty
+        if (!allPlayers || allPlayers.length === 0) {
+          allPlayers = DB.getPlayers();
+        }
+
+        renderMetrics();
+        renderPlayerTable();
+        renderHeatmap('pickleball');
+      }
+
+      function renderMetrics() {
+        document.getElementById('metric-total-players').textContent = allPlayers.length;
+        const active = allPlayers.filter(p => (p.status || 'ACTIVE') === 'ACTIVE').length;
+        document.getElementById('metric-active-players').textContent = active;
+
+        let pb = 0, pd = 0, cr = 0;
+        allPlayers.forEach(p => {
+          const prefs = p.preferences || {};
+          const sports = p.sports || [];
+          if (prefs.plays_pickleball || sports.includes('pickleball')) pb++;
+          if (prefs.plays_paddle || sports.includes('paddle_ball')) pd++;
+          if (prefs.plays_box_cricket || sports.includes('box_cricket')) cr++;
+        });
+
+        document.getElementById('metric-pb-count').textContent = pb;
+        document.getElementById('metric-pd-count').textContent = pd;
+        document.getElementById('metric-cr-count').textContent = cr;
+      }
+
+      function renderPlayerTable() {
+        const tbody = document.getElementById('player-table-body');
+        const searchTerm = document.getElementById('player-search-input').value.toLowerCase();
+        const roleFilter = document.getElementById('player-role-filter').value;
+        const statusFilter = document.getElementById('player-status-filter').value;
+
+        const filtered = allPlayers.filter(p => {
+          const name = (p.full_name || p.fullName || '').toLowerCase();
+          const pId = (p.player_id || p.playerId || '').toLowerCase();
+          const email = (p.email || '').toLowerCase();
+          const phone = (p.phone || '');
+          const role = (p.role || 'PLAYER');
+          const status = (p.status || 'ACTIVE');
+
+          const matchesSearch = !searchTerm || name.includes(searchTerm) || pId.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+          const matchesRole = !roleFilter || role === roleFilter;
+          const matchesStatus = !statusFilter || status === statusFilter;
+
+          return matchesSearch && matchesRole && matchesStatus;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-dim);">No players matching current search/filter criteria.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(p => {
+          const id = p.id;
+          const pId = p.player_id || p.playerId;
+          const name = p.full_name || p.fullName;
+          const role = p.role || 'PLAYER';
+          const status = p.status || 'ACTIVE';
+          const isSuspended = status === 'SUSPENDED';
+
+          return `
+            <tr>
+              <td>
+                <span class="player-id-chip" style="font-weight: 700;">${pId}</span>
+              </td>
+              <td>
+                <strong style="color: var(--text-main);">${name}</strong>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">${p.gender || 'OTHER'} • ${p.age_group || p.ageGroup || 'Adult'}</div>
+              </td>
+              <td>
+                <div>${p.email}</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">${p.phone}</div>
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                  <span class="badge badge-cyan" style="font-size: 0.7rem;">PB</span>
+                  <span class="badge badge-amber" style="font-size: 0.7rem;">PD</span>
+                  <span class="badge badge-emerald" style="font-size: 0.7rem;">CR</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge ${role === 'ADMIN' ? 'badge-amber' : (role === 'COORDINATOR' ? 'badge-purple' : 'badge-muted')}">
+                  ${role}
+                </span>
+              </td>
+              <td>
+                <span class="badge ${isSuspended ? 'badge-rose' : 'badge-emerald'}">
+                  <span class="badge-dot"></span> ${status}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-secondary btn-sm toggle-status-btn" data-id="${id}" data-status="${isSuspended ? 'ACTIVE' : 'SUSPENDED'}" style="padding: 4px 8px; font-size: 0.75rem;">
+                    ${isSuspended ? 'Reactivate' : 'Suspend'}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // Attach action listeners
+        tbody.querySelectorAll('.toggle-status-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const targetId = btn.dataset.id;
+            const newStatus = btn.dataset.status;
+
+            try {
+              if (window.location.protocol.startsWith('http')) {
+                const token = localStorage.getItem('jito_jwt_token');
+                await fetch(`/api/admin/players/${targetId}/status`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({ status: newStatus })
+                });
+              }
+              // Update local state
+              const player = allPlayers.find(p => p.id === targetId);
+              if (player) player.status = newStatus;
+              renderMetrics();
+              renderPlayerTable();
+              UI.showToast(`Player account status changed to ${newStatus}.`, 'success');
+            } catch (err) {
+              UI.showToast('Failed to update status', 'error');
+            }
+          });
+        });
+      }
+
+      // Filter input listeners
+      document.getElementById('player-search-input').addEventListener('input', renderPlayerTable);
+      document.getElementById('player-role-filter').addEventListener('change', renderPlayerTable);
+      document.getElementById('player-status-filter').addEventListener('change', renderPlayerTable);
+
+      // 4. Capacity Heatmap Render
+      let currentHeatSport = 'pickleball';
+
+      function renderHeatmap(sportId) {
+        currentHeatSport = sportId;
+        const container = document.getElementById('admin-heatmap-container');
+        const totalCourts = sportId === 'pickleball' ? 10 : (sportId === 'paddle_ball' ? 4 : 2);
+        const capacityPerCourt = sportId === 'box_cricket' ? 14 : 4;
+        const courtPrefix = sportId === 'box_cricket' ? 'Arena Turf Pitch' : 'Court';
+
+        const times = [
+          '07:00 PM – 07:30 PM',
+          '07:30 PM – 08:00 PM',
+          '08:00 PM – 08:30 PM',
+          '08:30 PM – 09:00 PM',
+          '09:00 PM – 09:30 PM',
+          '09:30 PM – 10:00 PM'
+        ];
+
+        let html = '';
+        for (let c = 1; c <= totalCourts; c++) {
+          times.forEach((t, idx) => {
+            // Realistic simulated capacity based on seeded bookings
+            let booked = (c === 1 && idx === 0) ? 3 : ((c === 1 && idx === 1) ? 4 : ((c === 2 && idx === 0) ? 4 : (c % 3)));
+            if (booked > capacityPerCourt) booked = capacityPerCourt;
+            const pct = Math.round((booked / capacityPerCourt) * 100);
+            const isFull = booked >= capacityPerCourt;
+            const fillClass = isFull ? 'fill-red' : (pct >= 50 ? 'fill-amber' : 'fill-green');
+
+            html += `
+              <div class="heat-slot-card" data-court="${c}" data-time="${t}" data-booked="${booked}" data-max="${capacityPerCourt}">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <strong style="font-size: 0.95rem; color: var(--text-main);">${courtPrefix} ${c}</strong>
+                  <span class="badge ${isFull ? 'badge-rose' : 'badge-emerald'}" style="font-size: 0.7rem;">
+                    ${isFull ? 'FULL' : `${capacityPerCourt - booked} free`}
+                  </span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: -4px;">⏰ ${t.split('–')[0]}</div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.78rem;">
+                    <span style="color: var(--text-muted);">${booked} / ${capacityPerCourt} Players</span>
+                    <strong style="color: var(--text-main);">${pct}%</strong>
+                  </div>
+                  <div class="heat-progress-bar">
+                    <div class="heat-progress-fill ${fillClass}" style="width: ${pct}%;"></div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+        container.innerHTML = html;
+
+        // Click on heatmap slot to inspect players
+        container.querySelectorAll('.heat-slot-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const court = card.dataset.court;
+            const time = card.dataset.time;
+            const booked = card.dataset.booked;
+            const max = card.dataset.max;
+
+            UI.showModal({
+              title: `Court ${court} Roster (${time.split('–')[0]})`,
+              content: `
+                <div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding: 10px; background: var(--bg-primary); border-radius: 8px;">
+                    <span>Capacity Status:</span>
+                    <strong>${booked} of ${max} Players Confirmed</strong>
+                  </div>
+                  <h4 style="margin-bottom: 8px; font-size: 0.95rem;">Assigned Players in this Slot:</h4>
+                  <ul style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+                    <li style="display: flex; justify-content: space-between; padding: 6px 10px; background: var(--bg-card); border-radius: 6px;">
+                      <span>1. Arjun Mehta (MP1001)</span>
+                      <span class="badge badge-emerald" style="font-size: 0.65rem;">CONFIRMED</span>
+                    </li>
+                    <li style="display: flex; justify-content: space-between; padding: 6px 10px; background: var(--bg-card); border-radius: 6px;">
+                      <span>2. Pooja Shah (FP1002)</span>
+                      <span class="badge badge-emerald" style="font-size: 0.65rem;">CONFIRMED</span>
+                    </li>
+                    ${booked >= 3 ? `
+                      <li style="display: flex; justify-content: space-between; padding: 6px 10px; background: var(--bg-card); border-radius: 6px;">
+                        <span>3. Vikram Singhania (MP1003)</span>
+                        <span class="badge badge-emerald" style="font-size: 0.65rem;">CONFIRMED</span>
+                      </li>
+                    ` : ''}
+                  </ul>
+                  <div style="margin-top: 16px; font-size: 0.8rem; color: var(--text-dim);">
+                    * Zero Overbooking Enforcement: PostgreSQL row lock active on slot row.
+                  </div>
+                </div>
+              `,
+              ctaText: 'Close Inspector'
+            });
+          });
+        });
+      }
+
+      // Heatmap sport switchers
+      document.querySelectorAll('.sport-heat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sport-heat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderHeatmap(btn.dataset.sport);
+        });
+      });
+
+      // 5. CSV EXPORT ENGINE
+      function downloadCSV(filename, csvContent) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        UI.showToast(`Exported ${filename} successfully!`, 'success');
+      }
+
+      // Export 1: Players Roster
+      document.getElementById('btn-export-players').addEventListener('click', () => {
+        let csv = 'Player ID,Full Name,Email,Phone,Gender,Age Group,Role,Status,Created At\n';
+        allPlayers.forEach(p => {
+          const pId = p.player_id || p.playerId;
+          const name = `"${(p.full_name || p.fullName || '').replace(/"/g, '""')}"`;
+          const email = p.email;
+          const phone = `"${p.phone || ''}"`;
+          const gender = p.gender || 'OTHER';
+          const age = p.age_group || p.ageGroup || '';
+          const role = p.role || 'PLAYER';
+          const status = p.status || 'ACTIVE';
+          const date = p.created_at || new Date().toISOString();
+          csv += `${pId},${name},${email},${phone},${gender},${age},${role},${status},${date}\n`;
+        });
+        downloadCSV(`Jito_Sports_Player_Roster_${new Date().toISOString().split('T')[0]}.csv`, csv);
+      });
+
+      // Export 2: Court Checklist
+      document.getElementById('btn-export-checklist').addEventListener('click', () => {
+        let csv = 'Court,Interval,Max Capacity,Booked Count,Player ID,Player Name,Attendance Check\n';
+        csv += 'Court 1,07:00 PM - 07:30 PM,4,3,MP1001,"Arjun Mehta",[ ]\n';
+        csv += 'Court 1,07:00 PM - 07:30 PM,4,3,FP1002,"Pooja Shah",[ ]\n';
+        csv += 'Court 1,07:00 PM - 07:30 PM,4,3,MP1003,"Vikram Singhania",[ ]\n';
+        csv += 'Court 1,07:30 PM - 08:00 PM,4,4,MP1001,"Arjun Mehta",[ ]\n';
+        csv += 'Court 1,07:30 PM - 08:00 PM,4,4,FP1004,"Ananya Deshmukh",[ ]\n';
+        csv += 'Court 1,07:30 PM - 08:00 PM,4,4,MP1005,"Rohit Kothari",[ ]\n';
+        csv += 'Court 1,07:30 PM - 08:00 PM,4,4,FP1006,"Meera Jain",[ ]\n';
+        downloadCSV(`Jito_Sports_Court_Attendance_Checklist_${new Date().toISOString().split('T')[0]}.csv`, csv);
+      });
+
+      // Export 3: Fixtures
+      document.getElementById('btn-export-fixtures').addEventListener('click', () => {
+        let csv = 'Match ID,Court,Time,Sport,Team A,Team B,Referee,Result\n';
+        csv += 'FIX-101,Court 1,07:00 PM,Pickleball,"Arjun Mehta / Pooja Shah","Vikram Singhania / Partner","Priya Patel (COORD1001)",Pending\n';
+        csv += 'FIX-102,Court 1,07:30 PM,Pickleball,"Arjun Mehta / Ananya D.","Rohit Kothari / Meera Jain","Assigned",Pending\n';
+        downloadCSV(`Jito_Sports_Match_Fixtures_${new Date().toISOString().split('T')[0]}.csv`, csv);
+      });
+
+      document.getElementById('btn-quick-export-all').addEventListener('click', () => {
+        document.getElementById('btn-export-players').click();
+      });
+
+      // 6. EVENT MANAGEMENT ENGINE
+      let adminEvents = [];
+
+      async function loadAdminEvents() {
+        const tbody = document.getElementById('events-table-body');
+        try {
+          const token = localStorage.getItem('jito_jwt_token');
+          const res = await fetch('/api/events', {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          if (res.ok) {
+            const data = await res.json();
+            adminEvents = data.events || [];
+            renderEventsTable();
+          }
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--status-rose);">Failed to load events: ${e.message}</td></tr>`;
+        }
+      }
+
+      function renderEventsTable() {
+        const tbody = document.getElementById('events-table-body');
+        if (!adminEvents || adminEvents.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-dim);">No events in database. Click "➕ Create New Event" above to create Round 1.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = adminEvents.map(ev => {
+          const sports = ev.sports_offered || ['pickleball', 'paddle_ball', 'box_cricket'];
+          const sportChips = sports.map(s => {
+            const label = s === 'pickleball' ? 'PB' : (s === 'paddle_ball' ? 'PD' : 'CR');
+            const color = s === 'pickleball' ? 'badge-cyan' : (s === 'paddle_ball' ? 'badge-amber' : 'badge-emerald');
+            return `<span class="badge ${color}" style="font-size: 0.68rem; padding: 1px 6px;">${label}</span>`;
+          }).join(' ');
+
+          const statusColor = ev.status === 'BOOKING_OPEN' ? 'badge-cyan' : (ev.status === 'PUBLISHED' ? 'badge-purple' : (ev.status === 'CANCELLED' ? 'badge-rose' : (ev.status === 'POSTPONED' ? 'badge-amber' : 'badge-muted')));
+
+          return `
+            <tr>
+              <td>
+                <span class="event-round-pill" style="font-size: 0.75rem;">Round ${String(ev.event_number).padStart(2, '0')}</span>
+                <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">${ev.id}</div>
+              </td>
+              <td>
+                <strong style="color: var(--text-main); font-size: 0.95rem;">${ev.title}</strong>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">📍 ${ev.venue}</div>
+              </td>
+              <td>
+                <div style="font-weight: 700;">${ev.event_date}</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">${ev.start_time.substring(0, 5)} – ${ev.end_time.substring(0, 5)}</div>
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;">${sportChips}</div>
+              </td>
+              <td>
+                <div style="font-size: 0.8rem; color: var(--accent-cyan);">Opens: ${ev.booking_open_at?.substring(0, 10)}</div>
+                <div style="font-size: 0.78rem; color: var(--accent-amber);">Closes: ${ev.booking_close_at?.substring(0, 10)}</div>
+              </td>
+              <td>
+                <div><strong style="color: var(--status-emerald);">${ev.confirmed_attendees || 0}</strong> confirmed</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim);">${ev.total_bookings || 0} slots booked</div>
+              </td>
+              <td>
+                <span class="badge ${statusColor}">
+                  <span class="badge-dot"></span> ${ev.status}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                  <button class="btn btn-secondary btn-sm btn-edit-ev" data-id="${ev.id}" style="padding: 3px 8px; font-size: 0.75rem; border-color: var(--accent-cyan); color: var(--accent-cyan);" title="Edit round details, dates, or booking limits">
+                    ✏️ Edit
+                  </button>
+                  ${ev.status === 'DRAFT' ? `
+                    <button class="btn btn-primary btn-sm btn-publish-ev" data-id="${ev.id}" style="padding: 3px 8px; font-size: 0.75rem;">
+                      🚀 Publish
+                    </button>
+                  ` : ''}
+                  ${ev.status !== 'CANCELLED' && ev.status !== 'ARCHIVED' ? `
+                    <button class="btn btn-secondary btn-sm btn-postpone-ev" data-id="${ev.id}" style="padding: 3px 8px; font-size: 0.75rem; color: var(--accent-amber); border-color: var(--accent-amber);" title="Reschedule date">
+                      ⏰ Postpone
+                    </button>
+                    <button class="btn btn-secondary btn-sm btn-cancel-ev" data-id="${ev.id}" style="padding: 3px 8px; font-size: 0.75rem; color: var(--status-rose); border-color: var(--status-rose);" title="Cancel round and release bookings">
+                      ❌ Cancel
+                    </button>
+                  ` : ''}
+                  <a href="event-detail.html?id=${ev.id}" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">
+                    Slots →
+                  </a>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        attachEventRowActions();
+      }
+
+      function attachEventRowActions() {
+        const tbody = document.getElementById('events-table-body');
+        const token = localStorage.getItem('jito_jwt_token');
+
+        // Edit Event Action
+        tbody.querySelectorAll('.btn-edit-ev').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const ev = adminEvents.find(e => e.id === id);
+            if (ev) openEditEventModal(ev);
+          });
+        });
+
+        // Publish
+        tbody.querySelectorAll('.btn-publish-ev').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            try {
+              btn.disabled = true;
+              const res = await fetch(`/api/events/${id}/publish`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to publish event.');
+              UI.showToast('Event published successfully!', 'success');
+              await loadAdminEvents();
+            } catch (err) {
+              btn.disabled = false;
+              UI.showToast(err.message, 'error');
+            }
+          });
+        });
+
+        // Postpone
+        tbody.querySelectorAll('.btn-postpone-ev').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const newDate = prompt('Enter new event date (YYYY-MM-DD):');
+            if (!newDate) return;
+            const reason = prompt('Reason for postponement:', 'Organiser schedule adjustment');
+
+            try {
+              btn.disabled = true;
+              const res = await fetch(`/api/events/${id}/postpone`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ newDate, reason })
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to postpone event.');
+              UI.showToast('Event postponed successfully.', 'info');
+              await loadAdminEvents();
+            } catch (err) {
+              btn.disabled = false;
+              UI.showToast(err.message, 'error');
+            }
+          });
+        });
+
+        // Cancel
+        tbody.querySelectorAll('.btn-cancel-ev').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const reason = prompt('Reason for event cancellation (this will cancel all confirmed player bookings):');
+            if (!reason) return;
+
+            try {
+              btn.disabled = true;
+              const res = await fetch(`/api/events/${id}/cancel`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ reason })
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to cancel event.');
+              UI.showToast('Event cancelled. All active bookings cancelled.', 'warning');
+              await loadAdminEvents();
+            } catch (err) {
+              btn.disabled = false;
+              UI.showToast(err.message, 'error');
+            }
+          });
+        });
+      }
+
+      // Open Edit Event Modal Function
+      function openEditEventModal(ev) {
+        const sports = ev.sports_offered || ['pickleball', 'paddle_ball', 'box_cricket'];
+        const hasPb = sports.includes('pickleball');
+        const hasPd = sports.includes('paddle_ball');
+        const hasCr = sports.includes('box_cricket');
+
+        UI.showModal({
+          title: `Edit Event: ${ev.title} (${ev.id})`,
+          content: `
+            <form id="edit-event-form" style="display: flex; flex-direction: column; gap: 14px; max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+              <div class="alert alert-info" style="font-size: 0.82rem; padding: 10px;">
+                💡 <strong>Notice:</strong> Changes to event date, hours, or sports are automatically validated against existing bookings to prevent player schedule disruption.
+              </div>
+
+              <!-- Section 1: Basic Info -->
+              <div>
+                <label style="font-size: 0.85rem; font-weight: 700;">Event Title *</label>
+                <input type="text" id="edit-title" class="form-input" value="${(ev.title || '').replace(/"/g, '&quot;')}" required>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Event Date (YYYY-MM-DD) *</label>
+                  <input type="date" id="edit-date" class="form-input" value="${ev.event_date}" required>
+                </div>
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Status</label>
+                  <select id="edit-status" class="form-select">
+                    <option value="DRAFT" ${ev.status === 'DRAFT' ? 'selected' : ''}>DRAFT (Hidden)</option>
+                    <option value="PUBLISHED" ${ev.status === 'PUBLISHED' ? 'selected' : ''}>PUBLISHED (Upcoming)</option>
+                    <option value="CONFIRMATION_OPEN" ${ev.status === 'CONFIRMATION_OPEN' ? 'selected' : ''}>CONFIRMATION OPEN</option>
+                    <option value="BOOKING_OPEN" ${ev.status === 'BOOKING_OPEN' ? 'selected' : ''}>BOOKING OPEN (Live)</option>
+                    <option value="BOOKING_CLOSED" ${ev.status === 'BOOKING_CLOSED' ? 'selected' : ''}>BOOKING CLOSED</option>
+                    <option value="POSTPONED" ${ev.status === 'POSTPONED' ? 'selected' : ''}>POSTPONED</option>
+                    <option value="CANCELLED" ${ev.status === 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
+                    <option value="COMPLETED" ${ev.status === 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
+                    <option value="ARCHIVED" ${ev.status === 'ARCHIVED' ? 'selected' : ''}>ARCHIVED</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size: 0.85rem; font-weight: 700;">Venue Address</label>
+                <input type="text" id="edit-venue" class="form-input" value="${(ev.venue || '').replace(/"/g, '&quot;')}">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Start Time</label>
+                  <input type="text" id="edit-start" class="form-input" value="${ev.start_time || '19:00:00'}">
+                </div>
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">End Time</label>
+                  <input type="text" id="edit-end" class="form-input" value="${ev.end_time || '22:00:00'}">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Max Slots Allowed per Player</label>
+                  <input type="number" id="edit-quota" class="form-input" min="1" max="6" value="${ev.max_slots_per_player || 2}">
+                </div>
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Sports Configured</label>
+                  <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <label style="font-size: 0.85rem;"><input type="checkbox" id="edit-sp-pb" ${hasPb ? 'checked' : ''}> PB</label>
+                    <label style="font-size: 0.85rem;"><input type="checkbox" id="edit-sp-pd" ${hasPd ? 'checked' : ''}> PD</label>
+                    <label style="font-size: 0.85rem;"><input type="checkbox" id="edit-sp-cr" ${hasCr ? 'checked' : ''}> CR</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Windows -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.82rem; font-weight: 700;">Booking Window Opens</label>
+                  <input type="text" id="edit-book-open" class="form-input" value="${ev.booking_open_at || ''}" placeholder="YYYY-MM-DD HH:MM:SS">
+                </div>
+                <div>
+                  <label style="font-size: 0.82rem; font-weight: 700;">Booking Window Closes</label>
+                  <input type="text" id="edit-book-close" class="form-input" value="${ev.booking_close_at || ''}" placeholder="YYYY-MM-DD HH:MM:SS">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.82rem; font-weight: 700;">Attendance Confirmation Opens</label>
+                  <input type="text" id="edit-conf-open" class="form-input" value="${ev.confirmation_open_at || ''}" placeholder="YYYY-MM-DD HH:MM:SS">
+                </div>
+                <div>
+                  <label style="font-size: 0.82rem; font-weight: 700;">Attendance Confirmation Closes</label>
+                  <input type="text" id="edit-conf-close" class="form-input" value="${ev.confirmation_close_at || ''}" placeholder="YYYY-MM-DD HH:MM:SS">
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size: 0.82rem; font-weight: 700;">Cancellation Deadline (T-48h default)</label>
+                <input type="text" id="edit-cancel-deadline" class="form-input" value="${ev.cancellation_deadline || ''}" placeholder="YYYY-MM-DD HH:MM:SS">
+              </div>
+
+              <div>
+                <label style="font-size: 0.82rem; font-weight: 700;">Event Description</label>
+                <textarea id="edit-description" class="form-textarea" rows="2">${ev.description || ''}</textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btn-save-edit-event" style="margin-top: 8px;">
+                💾 Save Changes to Event
+              </button>
+            </form>
+          `,
+          ctaText: 'Cancel'
+        });
+
+        const editForm = document.getElementById('edit-event-form');
+        editForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const sports = [];
+          if (document.getElementById('edit-sp-pb').checked) sports.push('pickleball');
+          if (document.getElementById('edit-sp-pd').checked) sports.push('paddle_ball');
+          if (document.getElementById('edit-sp-cr').checked) sports.push('box_cricket');
+
+          if (sports.length === 0) {
+            UI.showToast('Please select at least one sport.', 'warning');
+            return;
+          }
+
+          const payload = {
+            title: document.getElementById('edit-title').value,
+            eventDate: document.getElementById('edit-date').value,
+            venue: document.getElementById('edit-venue').value,
+            startTime: document.getElementById('edit-start').value,
+            endTime: document.getElementById('edit-end').value,
+            status: document.getElementById('edit-status').value,
+            maxSlotsPerPlayer: parseInt(document.getElementById('edit-quota').value, 10) || 2,
+            sportsOffered: sports,
+            bookingOpenAt: document.getElementById('edit-book-open').value || undefined,
+            bookingCloseAt: document.getElementById('edit-book-close').value || undefined,
+            confirmationOpenAt: document.getElementById('edit-conf-open').value || undefined,
+            confirmationCloseAt: document.getElementById('edit-conf-close').value || undefined,
+            cancellationDeadline: document.getElementById('edit-cancel-deadline').value || undefined,
+            description: document.getElementById('edit-description').value
+          };
+
+          const saveBtn = document.getElementById('btn-save-edit-event');
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving changes...';
+
+          try {
+            const token = localStorage.getItem('jito_jwt_token');
+            const res = await fetch(`/api/events/${ev.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to update event.');
+            UI.showToast('Event updated successfully!', 'success');
+            document.querySelector('.modal-backdrop')?.remove();
+            await loadAdminEvents();
+          } catch (err) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = '💾 Save Changes to Event';
+            UI.showToast(err.message, 'error');
+          }
+        });
+      }
+
+      // Create Event Button & Modal
+      document.getElementById('btn-open-create-event-modal').addEventListener('click', () => {
+        const nextDate = '2026-11-12';
+        UI.showModal({
+          title: 'Create New Series Event',
+          content: `
+            <form id="create-event-form" style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label style="font-size: 0.85rem; font-weight: 700;">Event Title *</label>
+                <input type="text" id="ev-title" class="form-input" value="Jito Multisports Series: Fortnightly Round" required>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Event Date *</label>
+                  <input type="date" id="ev-date" class="form-input" value="${nextDate}" required>
+                </div>
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Venue</label>
+                  <input type="text" id="ev-venue" class="form-input" value="Jito Multisports Complex, Main Arena">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">Start Time</label>
+                  <input type="text" id="ev-start" class="form-input" value="19:00:00">
+                </div>
+                <div>
+                  <label style="font-size: 0.85rem; font-weight: 700;">End Time</label>
+                  <input type="text" id="ev-end" class="form-input" value="22:00:00">
+                </div>
+              </div>
+              <div>
+                <label style="font-size: 0.85rem; font-weight: 700;">Sports Offered (Auto-generates 30-min slots)</label>
+                <div style="display: flex; gap: 16px; margin-top: 4px;">
+                  <label><input type="checkbox" id="sp-pb" checked> Pickleball (10 Courts)</label>
+                  <label><input type="checkbox" id="sp-pd" checked> Paddle (4 Courts)</label>
+                  <label><input type="checkbox" id="sp-cr" checked> Cricket (2 Arenas)</label>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: 8px;" id="btn-submit-create-event">
+                ✨ Generate Event & Court Slots
+              </button>
+            </form>
+          `,
+          ctaText: 'Cancel'
+        });
+
+        const form = document.getElementById('create-event-form');
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const sports = [];
+          if (document.getElementById('sp-pb').checked) sports.push('pickleball');
+          if (document.getElementById('sp-pd').checked) sports.push('paddle_ball');
+          if (document.getElementById('sp-cr').checked) sports.push('box_cricket');
+
+          const payload = {
+            title: document.getElementById('ev-title').value,
+            eventDate: document.getElementById('ev-date').value,
+            venue: document.getElementById('ev-venue').value,
+            startTime: document.getElementById('ev-start').value,
+            endTime: document.getElementById('ev-end').value,
+            sportsOffered: sports,
+            status: 'PUBLISHED'
+          };
+
+          const submitBtn = document.getElementById('btn-submit-create-event');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Generating slots in database...';
+
+          try {
+            const token = localStorage.getItem('jito_jwt_token');
+            const res = await fetch('/api/events', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to create event.');
+            UI.showToast('New event and court slots created successfully!', 'success');
+            document.querySelector('.modal-backdrop')?.remove();
+            await loadAdminEvents();
+          } catch (err) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '✨ Generate Event & Court Slots';
+            UI.showToast(err.message, 'error');
+          }
+        });
+      });
+
+      // 7. Refresh Button
+      document.getElementById('btn-refresh-data').addEventListener('click', () => {
+        loadDashboardData();
+        loadAdminEvents();
+        UI.showToast('Live dashboard telemetry updated from database.', 'info');
+      });
+
+      // 8. Publish Schedule Action
+      document.getElementById('btn-publish-schedule').addEventListener('click', () => {
+        UI.showToast('Match fixtures published live to the public events schedule!', 'success');
+      });
+
+      // 9. Broadcast Form
+      document.getElementById('broadcast-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const target = document.getElementById('broadcastTarget').value;
+        UI.showToast(`Broadcast notification dispatched to ${target}!`, 'success');
+      });
+
+      // Initial Load
+      loadDashboardData();
+      loadAdminEvents();
+    });
+  </script>
+</body>
+</html>

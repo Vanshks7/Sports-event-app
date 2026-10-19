@@ -1,0 +1,96 @@
+/* ==========================================================================
+   DESIGN TOKENS & CSS VARIABLES
+   Community Multisports Booking Portal (Jito Sports Series 2026-2027)
+   Theme: Athletic Editorial Neutral (Beige, Crisp White, Charcoal/Black)
+   ========================================================================== */
+
+:root {
+  /* Subtle, Light & Neutral Color Palette (Beige, Warm Stone, Crisp White) */
+  --bg-primary: #FAF9F5;       /* Warm subtle off-white / light beige */
+  --bg-secondary: #F3F1EB;     /* Soft warm beige / linen */
+  --bg-tertiary: #EAE7DF;      /* Structured warm stone */
+  --bg-card: #FFFFFF;          /* Pure crisp white card surface */
+  --bg-card-hover: #FCFBF9;    /* Clean hover state */
+  --bg-glass: rgba(255, 255, 255, 0.95);
+  --bg-input: #FFFFFF;
+
+  /* Athletic Brand Accents (Burnt Orange / Terracotta as in Basketball Editorial Reference) */
+  --accent-cyan: #E64016;       /* Athletic editorial burnt orange */
+  --accent-cyan-light: #FF5A2E;
+  --accent-cyan-glow: rgba(230, 64, 22, 0.15);
+  --accent-cyan-dim: rgba(230, 64, 22, 0.08);
+
+  /* Warm Sports Accent / Amber */
+  --accent-amber: #D97706;      /* Rich amber */
+  --accent-amber-light: #F59E0B;
+  --accent-amber-glow: rgba(217, 119, 6, 0.15);
+  --accent-amber-dim: rgba(217, 119, 6, 0.08);
+
+  /* Functional Status Colors (Clean, non-flashy, high legibility) */
+  --status-emerald: #059669;
+  --status-emerald-glow: rgba(5, 150, 105, 0.15);
+  --status-emerald-dim: rgba(5, 150, 105, 0.08);
+
+  --status-blue: #2563EB;
+  --status-blue-glow: rgba(37, 99, 235, 0.15);
+  --status-blue-dim: rgba(37, 99, 235, 0.08);
+
+  --status-purple: #7C3AED;
+  --status-purple-glow: rgba(124, 58, 237, 0.15);
+
+  --status-rose: #DC2626;
+  --status-rose-glow: rgba(220, 38, 38, 0.15);
+  --status-rose-dim: rgba(220, 38, 38, 0.08);
+
+  /* High-Contrast, Professional Editorial Text */
+  --text-main: #121214;        /* Deep charcoal / near black */
+  --text-muted: #52525B;       /* Neutral slate grey for body reading */
+  --text-dim: #71717A;         /* Subtle caption grey */
+  --text-inverse: #FFFFFF;     /* White text on dark elements & buttons */
+
+  /* Clean, Subtle Borders & Dividers */
+  --border-subtle: #E4E1D8;     /* Soft warm grey/beige border */
+  --border-medium: #D1CDC2;     /* Medium separator border */
+  --border-focus: #121214;
+  --border-glow: 0 0 0 2px rgba(230, 64, 22, 0.25);
+
+  /* Athletic Condensed Display & Clean Modern Body Typography */
+  --font-display: 'Oswald', 'Barlow Condensed', 'Anton', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Subtle, Natural Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-cyan: 0 4px 16px rgba(230, 64, 22, 0.2);
+  --shadow-amber: 0 4px 16px rgba(217, 119, 6, 0.2);
+
+  /* Radii */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Max Widths */
+  --container-max: 1240px;
+  --container-narrow: 860px;
+
+  /* Transitions */
+  --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}

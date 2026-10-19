@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supported Sports — Community Multisports Series</title>
+  <meta name="description" content="Explore Pickleball, Paddle Ball, and Box Cricket formats, rules, court capacities, and scheduling models for the 2026-2027 sports series.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .sport-deepdive-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-12);
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      transition: all var(--transition-normal);
+    }
+
+    .sport-deepdive-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .sport-deepdive-card.reversed {
+      grid-template-columns: 1.25fr 1fr;
+    }
+
+    .sport-img-col {
+      position: relative;
+      min-height: 380px;
+    }
+
+    .sport-img-col img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sport-content-col {
+      padding: var(--space-8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .sport-rules-list {
+      margin: var(--space-4) 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sport-rules-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .sport-rules-list li::before {
+      content: '✔';
+      color: var(--accent-cyan);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .sport-deepdive-card, .sport-deepdive-card.reversed {
+        grid-template-columns: 1fr;
+      }
+      .sport-img-col {
+        height: 260px;
+        min-height: auto;
+      }
+    }
+
+    /* Capacity Matrix Table */
+    .capacity-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--space-6);
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .capacity-table th, .capacity-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .capacity-table th {
+      background: var(--bg-secondary);
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .capacity-table tr:hover td {
+      background: var(--bg-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    
+    <!-- PAGE HERO -->
+    <section class="section" style="padding-bottom: var(--space-8);">
+      <div class="container">
+        <div class="section-header" style="margin-bottom: var(--space-8);">
+          <div class="section-tag">
+            Multisport Spectrum
+          </div>
+          <h1 class="section-title">
+            Pickleball, Paddle Ball & Box Cricket
+          </h1>
+          <p class="section-subtitle">
+            One unified portal managing sport-specific capacity, court availability, and player rotations. 
+            Review rules, capacity models, and equipment for each discipline.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPORT 1: PICKLEBALL -->
+    <section class="section" id="pickleball" style="padding-top: 0;">
+      <div class="container">
+        <div class="sport-deepdive-card">
+          <div class="sport-img-col">
+            <img src="assets/images/pickleball.jpg" alt="Pickleball Doubles Game" loading="lazy">
+            <div style="position: absolute; top: 16px; left: 16px;">
+              <span class="badge badge-cyan"><span class="badge-dot"></span> 10 Dedicated Courts</span>
+            </div>
+          </div>
+          <div class="sport-content-col">
+            <span class="section-tag" style="align-self: flex-start; margin-bottom: 8px;">Featured Sport</span>
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">Pickleball</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              Combining elements of tennis, badminton, and ping-pong, Pickleball is the fastest growing sport in community athletics. Played on a badminton-sized court with a lower net and perforated plastic balls, each 30-minute slot delivers intense, accessible doubles rallies.
+            </p>
+
+            <div class="sport-specs-grid" style="margin-bottom: 16px;">
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Capacity Per Slot</span>
+                <span class="sport-spec-val" style="color: var(--accent-cyan);">4 Players (Doubles)</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Slot Duration</span>
+                <span class="sport-spec-val">30 Minutes</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Dedicated Courts</span>
+                <span class="sport-spec-val">10 Courts (Courts 1–10)</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Evening Capacity</span>
+                <span class="sport-spec-val">Up to 240 Appearances</span>
+              </div>
+            </div>
+
+            <h4 style="margin-bottom: 8px;">Key Rules & Format:</h4>
+            <ul class="sport-rules-list">
+              <li><strong>Doubles Rotation:</strong> 4 players share a court per 30-minute slot.</li>
+              <li><strong>The Non-Volley Zone (Kitchen):</strong> Players cannot volley the ball while standing in the 7-foot kitchen zone.</li>
+              <li><strong>Two-Bounce Rule:</strong> The serve must bounce, and the receiver's return must bounce before volleys are allowed.</li>
+              <li><strong>Underhand Serve:</strong> Serves are struck below waist height diagonally cross-court.</li>
+            </ul>
+
+            <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="register.html" class="btn btn-primary btn-sm">Register for Pickleball</a>
+              <a href="event-detail.html?id=1" class="btn btn-secondary btn-sm">View Court 1–10 Slots</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPORT 2: PADDLE BALL -->
+        <div class="sport-deepdive-card reversed" id="paddle_ball">
+          <div class="sport-content-col">
+            <span class="section-tag tag-amber" style="align-self: flex-start; margin-bottom: 8px;">Enclosed Court Sport</span>
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">Paddle Ball (Pádel)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              Pádel is played inside an enclosed glass and metallic mesh arena roughly one-third the size of a tennis court. The surrounding glass walls are active in play, allowing thrilling wall rebounds, strategic positioning, and dynamic fast-paced community play.
+            </p>
+
+            <div class="sport-specs-grid" style="margin-bottom: 16px;">
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Capacity Per Slot</span>
+                <span class="sport-spec-val" style="color: var(--accent-amber);">4 Players (Doubles)</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Court Surface</span>
+                <span class="sport-spec-val">Blue Synthetic Turf</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Wall Enclosure</span>
+                <span class="sport-spec-val">10mm Toughened Glass</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Racquet Type</span>
+                <span class="sport-spec-val">Solid Carbon Composite</span>
+              </div>
+            </div>
+
+            <h4 style="margin-bottom: 8px;">Key Rules & Format:</h4>
+            <ul class="sport-rules-list">
+              <li><strong>Glass Rebounds:</strong> After the ball bounces once on the turf, it may rebound off the glass walls before being struck.</li>
+              <li><strong>Underhand Serve:</strong> Serves must be struck waist-high after a preliminary floor bounce.</li>
+              <li><strong>Standard Scoring:</strong> Sets and games scored identically to traditional tennis.</li>
+              <li><strong>Equipment:</strong> Solid stringless racquets with micro-perforations for aerodynamic control.</li>
+            </ul>
+
+            <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="register.html" class="btn btn-accent btn-sm">Register for Paddle</a>
+              <a href="events.html" class="btn btn-secondary btn-sm">Check Next Paddle Event</a>
+            </div>
+          </div>
+          <div class="sport-img-col">
+            <img src="assets/images/paddle.jpg" alt="Padel Court Action" loading="lazy">
+            <div style="position: absolute; top: 16px; right: 16px;">
+              <span class="badge badge-amber"><span class="badge-dot"></span> Glass Enclosure</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPORT 3: BOX CRICKET -->
+        <div class="sport-deepdive-card" id="box_cricket">
+          <div class="sport-img-col">
+            <img src="assets/images/box_cricket.jpg" alt="Box Cricket Arena" loading="lazy">
+            <div style="position: absolute; top: 16px; left: 16px;">
+              <span class="badge badge-emerald"><span class="badge-dot"></span> High Density Turf</span>
+            </div>
+          </div>
+          <div class="sport-content-col">
+            <span class="section-tag" style="align-self: flex-start; margin-bottom: 8px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: var(--status-emerald);">Squad Action</span>
+            <h2 style="font-size: 2.2rem; margin-bottom: 12px;">Box Cricket</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              Box Cricket brings the excitement of India’s favourite sport into a high-speed, padded turf arena. Designed with continuous overhead and boundary nets, the ball remains constantly in play. Players register individually and are drafted into balanced 6v6 or 8v8 teams by match organizers.
+            </p>
+
+            <div class="sport-specs-grid" style="margin-bottom: 16px;">
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Capacity Per Match</span>
+                <span class="sport-spec-val" style="color: var(--status-emerald);">12–16 Players</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Playing Area</span>
+                <span class="sport-spec-val">Enclosed Net Turf Cage</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Formation Model</span>
+                <span class="sport-spec-val">Organiser-Assigned Squads</span>
+              </div>
+              <div class="sport-spec-item">
+                <span class="sport-spec-label">Ball Type</span>
+                <span class="sport-spec-val">Heavy/Light Tennis Ball</span>
+              </div>
+            </div>
+
+            <h4 style="margin-bottom: 8px;">Key Rules & Format:</h4>
+            <ul class="sport-rules-list">
+              <li><strong>Continuous Play:</strong> Boundary netting keeps the game moving with minimal dead-ball stoppages.</li>
+              <li><strong>Mandatory Bowling:</strong> Every squad member bowls at least one over, ensuring total community participation.</li>
+              <li><strong>Net Hits:</strong> Direct hits on the roof or side nets have specific run or dismissal values according to ground rules.</li>
+              <li><strong>Balanced Squads:</strong> Organisers review players' self-assessed skill levels to build fun, competitive matches.</li>
+            </ul>
+
+            <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="register.html" class="btn btn-primary btn-sm">Join Box Cricket Pool</a>
+              <a href="events.html" class="btn btn-secondary btn-sm">See Match Calendar</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CAPACITY PLANNING BREAKDOWN -->
+    <section class="section" style="background: var(--bg-secondary);">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">
+            Capacity Engineering
+          </div>
+          <h2 class="section-title">
+            10 Courts × 3 Hours = 60 Court-Slots
+          </h2>
+          <p class="section-subtitle">
+            How court-slots translate to player appearances across the 3-hour evening window (7:00 PM to 10:00 PM).
+          </p>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="capacity-table" aria-label="Capacity Planning Matrix">
+            <thead>
+              <tr>
+                <th>Sport Discipline</th>
+                <th>Courts Available</th>
+                <th>Slots per Court</th>
+                <th>Total Court-Slots</th>
+                <th>Players per Slot</th>
+                <th>Max Player Appearances</th>
+                <th>Booking Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pickleball</strong></td>
+                <td>10 Courts</td>
+                <td>6 (30 min each)</td>
+                <td>60 Units</td>
+                <td>4 Players (Doubles)</td>
+                <td><span style="color: var(--accent-cyan); font-weight: 700;">Up to 240</span></td>
+                <td>Individual Spot (1 of 4)</td>
+              </tr>
+              <tr>
+                <td><strong>Paddle Ball</strong></td>
+                <td>4 Courts</td>
+                <td>6 (30 min each)</td>
+                <td>24 Units</td>
+                <td>4 Players (Doubles)</td>
+                <td><span style="color: var(--accent-amber); font-weight: 700;">Up to 96</span></td>
+                <td>Individual Spot (1 of 4)</td>
+              </tr>
+              <tr>
+                <td><strong>Box Cricket</strong></td>
+                <td>2 Arenas</td>
+                <td>3 or 6 Matches</td>
+                <td>6 to 12 Units</td>
+                <td>14 Players / Game</td>
+                <td><span style="color: var(--status-emerald); font-weight: 700;">Up to 84</span></td>
+                <td>Player Pool / Squad Draft</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: var(--space-8); padding: var(--space-6); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+          <h4 style="color: var(--accent-cyan); margin-bottom: 8px;">Important Capacity Note (From Project Framework, Page 5):</h4>
+          <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0;">
+            <em>"240 is not the number of separate time slots. It is the potential player-place count under a four-player shared-court model."</em> Each 30-minute interval on each court represents an independent capacity unit where 4 players share the playing surface.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      UI.renderNavbar('sports');
+      UI.renderFooter();
+    });
+  </script>
+</body>
+</html>

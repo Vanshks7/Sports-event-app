@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Sign In — Community Multisports Portal</title>
+  <meta name="description" content="Sign in with your Unique Player ID or email to confirm attendance, manage bookings, and view match schedules.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .login-container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .demo-credentials-box {
+      margin-top: var(--space-6);
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    <div class="container section">
+      <div class="login-container">
+        
+        <div class="glass-card" style="padding: var(--space-8);">
+          <div style="text-align: center; margin-bottom: var(--space-6);">
+            <div class="brand-icon" style="margin: 0 auto 16px auto;">🏆</div>
+            <h1 style="font-size: 1.8rem; margin-bottom: 4px;">Player Portal Login</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+              Enter your Unique Player ID or registered email
+            </p>
+          </div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="loginId" class="form-label">
+                <span>Player ID or Email</span>
+              </label>
+              <input type="text" id="loginId" class="form-input" placeholder="e.g. MP1001 or name@example.com" required autofocus>
+              <span class="form-helper">Your permanent identifier (e.g., MP1001, FP1002).</span>
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="form-label">
+                <span>Password</span>
+                <a href="set-password.html" style="font-size: 0.8rem; color: var(--accent-cyan);">Set Password</a>
+              </label>
+              <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--space-4);">
+              Sign In to Portal →
+            </button>
+          </form>
+
+          <!-- Prototype Test Credentials Helper -->
+          <div class="demo-credentials-box">
+            <strong style="color: var(--accent-amber); display: block; margin-bottom: 6px;">
+              ⚡ Prototype Fast-Login Buttons:
+            </strong>
+            <p style="color: var(--text-dim); margin-bottom: 8px;">
+              Click to instantly populate credentials for test accounts:
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" id="demo-user-1" style="flex: 1; min-width: 120px;">
+                Arjun (MP1001)
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="demo-user-2" style="flex: 1; min-width: 120px;">
+                Pooja (FP1002)
+              </button>
+              <button type="button" class="btn btn-accent btn-sm" id="demo-user-admin" style="flex: 1; min-width: 140px;">
+                👑 Master Admin
+              </button>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); font-size: 0.9rem; color: var(--text-muted);">
+            Don't have a permanent account yet?<br>
+            <a href="register.html" style="font-weight: 700; color: var(--accent-cyan);">Register Once for Free →</a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      UI.renderNavbar('login');
+      UI.renderFooter();
+
+      const form = document.getElementById('login-form');
+      const loginIdInput = document.getElementById('loginId');
+      const passwordInput = document.getElementById('password');
+
+      // Fast-login buttons
+      document.getElementById('demo-user-1').addEventListener('click', () => {
+        loginIdInput.value = 'MP1001';
+        passwordInput.value = 'DemoPlayer@2026';
+      });
+
+      document.getElementById('demo-user-2').addEventListener('click', () => {
+        loginIdInput.value = 'FP1002';
+        passwordInput.value = 'DemoPlayer@2026';
+      });
+
+      document.getElementById('demo-user-admin').addEventListener('click', () => {
+        loginIdInput.value = 'admin@jito.org';
+        passwordInput.value = 'AdminRootSecure2026!';
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = loginIdInput.value.trim();
+        const pwd = passwordInput.value;
+
+        if (!id || !pwd) {
+          UI.showToast('Please enter your Player ID / Email and password.', 'warning');
+          return;
+        }
+
+        try {
+          const user = await DB.login(id, pwd);
+          const displayName = user.full_name || user.fullName;
+          const displayId = user.player_id || user.playerId;
+          const role = user.role;
+
+          UI.showToast(`Welcome back, ${displayName} (${displayId})!`, 'success');
+
+          setTimeout(() => {
+            if (role === 'ADMIN' || role === 'COORDINATOR') {
+              window.location.href = 'admin.html';
+            } else {
+              window.location.href = 'events.html';
+            }
+          }, 600);
+        } catch (err) {
+          UI.showToast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

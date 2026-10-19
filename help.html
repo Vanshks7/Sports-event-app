@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help, Rules & FAQ — Community Multisports Portal</title>
+  <meta name="description" content="Frequently asked questions, booking policies, capacity models, two-slot limit rules, and security guidelines for the Community Multisports Series.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .faq-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--transition-fast);
+    }
+
+    .faq-item:hover {
+      border-color: var(--border-medium);
+    }
+
+    .faq-trigger {
+      width: 100%;
+      text-align: left;
+      padding: var(--space-6);
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .faq-trigger span.icon {
+      font-size: 1.25rem;
+      color: var(--accent-cyan);
+      transition: transform var(--transition-normal);
+    }
+
+    .faq-item.open .faq-trigger span.icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-body {
+      padding: 0 var(--space-6) var(--space-6) var(--space-6);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      display: none;
+    }
+
+    .faq-item.open .faq-body {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared Header -->
+  <header id="site-header"></header>
+
+  <main class="main-content">
+    <div class="container-narrow section">
+
+      <div class="section-header">
+        <div class="section-tag tag-amber">
+          Knowledge Base & Rules
+        </div>
+        <h1 class="section-title">
+          Frequently Asked Questions
+        </h1>
+        <p class="section-subtitle">
+          Everything you need to know about permanent accounts, the 15-day cadence, 30-minute court slots, and the 2-slot quota.
+        </p>
+      </div>
+
+      <div class="faq-accordion">
+
+        <!-- FAQ 1 -->
+        <div class="faq-item open" id="cadence">
+          <button class="faq-trigger">
+            <span>What is the core principle: "One registration. Many events."?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            You only register your personal profile once to receive a permanent Unique Player ID (e.g. <code>MP1001</code> for male, <code>FP1002</code> for female). 
+            <br><br>
+            Instead of forcing participants to commit to an entire year of dates months in advance, we run <strong>one event approximately every 15 days</strong>. Players confirm attendance and pick specific 30-minute slots closer to each date when their personal schedules are known.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item" id="two-slot-rule">
+          <button class="faq-trigger">
+            <span>How does the "Maximum Two Slots" rule work?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            To ensure fair access across our community, each player can hold a maximum of <strong>two 30-minute slots per event evening</strong> (representing 60 minutes of total court time).
+            <br><br>
+            These can be two consecutive intervals on the same court (e.g., 7:00 PM – 7:30 PM followed by 7:30 PM – 8:00 PM), or spaced intervals. The platform automatically blocks any player from reserving a 3rd slot or booking overlapping times.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item" id="capacity-model">
+          <button class="faq-trigger">
+            <span>How is capacity calculated? What does "10 courts × 3 hours = 60 court-slots" mean?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            With 10 courts available over a 3-hour evening (7:00 PM to 10:00 PM), each court offers six 30-minute intervals:
+            <br><br>
+            <code>10 courts × 6 slots per court = 60 court-slot units</code>
+            <br><br>
+            In doubles sports like Pickleball and Paddle Ball, 4 players share a court at any given time. This yields a total capacity of up to <strong>240 player appearances</strong> across the evening. As stated in our framework, 240 is not the number of separate time slots, but the maximum player appearances under a 4-player shared format.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item" id="windows">
+          <button class="faq-trigger">
+            <span>When does slot booking open and close for each round?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            Every 15-day event follows a strict, predictable window:
+            <ul style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <li><strong>7 Days Before (T-7d at 09:00 AM):</strong> Slot booking opens. All registered players can log in, confirm attendance, and select up to 2 slots.</li>
+              <li><strong>48 Hours Before (T-48h at 07:00 PM):</strong> Booking closes and attendance locks. Cancellations freeze to allow organizers to build match fixtures and assign referees.</li>
+              <li><strong>Day Before / Event Day:</strong> Final schedules and digital match passes are published to players.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="faq-item" id="overbooking">
+          <button class="faq-trigger">
+            <span>How does the portal prevent overbooking during simultaneous requests?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            When hundreds of community players attempt to reserve popular slots at 09:00 AM, our backend executes <strong>pessimistic row-level locks (PostgreSQL <code>SELECT ... FOR UPDATE</code>)</strong> within atomic database transactions.
+            <br><br>
+            Concurrent transactions for the same court-slot are queued sequentially, and kernel-level CHECK constraints prohibit <code>booked_count &gt; max_capacity</code>. If 20 players click the last spot at the same millisecond, exactly 1 succeeds and 19 are safely redirected to the waitlist.
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="faq-item" id="security">
+          <button class="faq-trigger">
+            <span>Why is there no default password (like "Welcome@123")?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            Default passwords present serious security vulnerabilities where accounts can be hijacked or altered by third parties. 
+            <br><br>
+            Under our approved security design, when a player registers, an account setup token is generated and emailed. The player sets their own private password, which is hashed with <strong>Argon2id</strong>.
+          </div>
+        </div>
+
+        <!-- FAQ 7 -->
+        <div class="faq-item" id="waitlist">
+          <button class="faq-trigger">
+            <span>What happens if a slot is full? How do waitlists work?</span>
+            <span class="icon">+</span>
+          </button>
+          <div class="faq-body">
+            If a slot reaches full capacity (e.g. 4/4 in Pickleball), players can join a First-In-First-Out (FIFO) waitlist. If any confirmed player cancels before the 48-hour deadline, position #1 on the waitlist is automatically promoted to confirmed and notified immediately via SMS/Email.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CONTACT DESK -->
+      <div class="glass-card" style="margin-top: var(--space-12); padding: var(--space-8); text-align: center;">
+        <h3 style="margin-bottom: 8px;">Still have questions?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Reach out to the Jito Sports event coordinators for assistance with registration or venue queries.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <a href="mailto:sports@jito.org" class="btn btn-secondary btn-sm">Email Event Coordinators</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register as Player →</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      UI.renderNavbar('help');
+      UI.renderFooter();
+
+      // Accordion toggle
+      document.querySelectorAll('.faq-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const item = trigger.closest('.faq-item');
+          item.classList.toggle('open');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
